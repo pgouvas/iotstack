@@ -5,6 +5,7 @@ CREATE TABLE node
 (
    id varchar(40) not null,
    clusterhead varchar(40),
+   lastupdate timestamp, 
    primary key(id)
 );
 

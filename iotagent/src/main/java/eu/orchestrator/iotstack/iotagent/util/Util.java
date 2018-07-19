@@ -20,7 +20,7 @@ public class Util {
     private static final Logger logger = Logger.getLogger(Util.class.getName());
 
     public static Node getNodeStatus() {
-        String output = executeCommand("status");           //cat status
+        String output = executeCommand("cat status");           //cat status
         String nodeid = "";
         List<Peer> peers = new ArrayList<>();
         //get node metadata
@@ -60,9 +60,14 @@ public class Util {
     public static String invokeRest(String ipv6) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://[" + ipv6 + "]:8080/api/v1/echo";
+        String response = "";
         logger.info("Invoking service echo at " + ipv6);
-        String response = restTemplate.getForObject(url, String.class);
-        logger.info("Response at " + ipv6);
+        try {
+            response = restTemplate.getForObject(url, String.class);
+            logger.info("Response at " + ipv6);
+        } catch (Exception ex) {
+            logger.severe(url + " is unreachable");
+        }
         return response;
     }//EoM
 

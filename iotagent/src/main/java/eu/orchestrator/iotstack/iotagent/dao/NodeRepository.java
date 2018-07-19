@@ -26,6 +26,7 @@ public class NodeRepository {
         public Node mapRow(ResultSet rs, int rowNum) throws SQLException {
             Node node = new Node();
             node.setId(rs.getString("id"));
+            node.setLastupdate(rs.getDate("lastupdate"));            
             return node;
         }//mapRaw         
     }//EoC 
@@ -44,8 +45,8 @@ public class NodeRepository {
 	}
 
 	public int insert(Node node) {
-		return jdbcTemplate.update("insert into node (id) " + "values(?)",
-				new Object[] { node.getId() });
+		return jdbcTemplate.update("insert into node (id,lastupdate) " + "values(?,?)",
+				new Object[] { node.getId() , node.getLastupdate() });
 	}
 
 	public int update(Node node) {
