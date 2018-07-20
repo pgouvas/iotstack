@@ -70,8 +70,64 @@
                             </mainClass>
                         </configuration>
                     </execution>
-                </executions>            
+                </executions>
             </plugin>
+            
+            <plugin>
+                <groupId>org.jolokia</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.13.9</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <alias>maestro</alias>
+                            <name>maestro/iotagent:${project.version}</name>
+                            <build>
+                                <from>anapsix/alpine-java:8_server-jre_unlimited</from>
+                                <assembly>
+                                    <inline>
+                                        <files>
+                                            <file>
+                                                <source>${project.build.directory}/${project.artifactId}-${project.version}-spring-boot.jar</source>
+                                            </file>
+                                        </files>
+                                    </inline>
+                                </assembly>
+                                <env>
+                                    <PROFILE>clusterhead</PROFILE>
+                                </env>
+                                <cmd>
+                                    <shell>java -jar maven/${project.artifactId}-${project.version}-spring-boot.jar --spring.profiles.active=$PROFILE</shell>
+                                </cmd>
+                                <ports>
+                                    <port>8080</port>
+                                </ports>
+                            </build>
+                            <run>
+                                <ports>
+                                    <port>8080:8080</port>
+                                </ports>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>docker:build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>docker:start</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>          
         </plugins>
     </build>            
                     

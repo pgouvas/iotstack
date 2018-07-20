@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 public class IoTAgent {
 
-    private static final Logger log = Logger.getLogger(IoTAgent.class.getName());
+    private static final Logger logger = Logger.getLogger(IoTAgent.class.getName());
     
     //It represents the current profile. it can be clusterhead or node  i.e. 
     //    mvn spring-boot:run -Dspring-boot.run.profiles=clusterhead
@@ -38,15 +38,17 @@ public class IoTAgent {
     
     public static void main(String[] args) {
         SpringApplication.run(IoTAgent.class, args);
+        logger.info("PROFILE:  "+ activeProfile);
+        
         //check profile
         if (activeProfile==null || !(activeProfile.equalsIgnoreCase("clusterhead") || activeProfile.equalsIgnoreCase("node")) ) {
-            log.log(Level.SEVERE,"Agent requires a specific profile e.g. mvn spring-boot:run -Dspring-boot.run.profiles=clusterhead/node");
+            logger.log(Level.SEVERE,"Agent requires a specific profile e.g. mvn spring-boot:run -Dspring-boot.run.profiles=clusterhead/node");
             System.exit(0);
         }        
         //check that NodeID is already configured
         Node node = Util.getNodeStatus();
         //noderepo.insert(node);
-        log.info(node.getId());        
+        logger.info(node.getId());        
     }//EoM
 
     @Value("${spring.profiles.active}")    
