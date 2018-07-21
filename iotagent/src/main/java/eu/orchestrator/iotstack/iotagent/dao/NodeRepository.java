@@ -9,8 +9,6 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -46,7 +44,6 @@ public class NodeRepository {
         return jdbcTemplate.update("delete from node where id=?", new Object[]{id});
     }
 
-//    @Transactional
     public int insert(Node node) {
         return jdbcTemplate.update("insert into node (id,lastupdate) " + "values(?,?)",
                 new Object[]{node.getId(), node.getLastupdate()});

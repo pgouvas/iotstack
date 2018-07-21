@@ -3,19 +3,23 @@ package eu.orchestrator.iotstack.iotagent;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
 import eu.orchestrator.iotstack.iotagent.util.Util;
 import eu.orchestrator.iotstack.transfer.Node;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  *
  * @author Panagiotis Gouvas
  */
+@EnableAsync
 @EnableScheduling
 @SpringBootApplication
 public class IoTAgent {
@@ -35,7 +39,6 @@ public class IoTAgent {
     @Autowired
     NodeRepository noderepo;
     
-    
     public static void main(String[] args) {
         SpringApplication.run(IoTAgent.class, args);
         logger.info("PROFILE:  "+ activeProfile);
@@ -51,6 +54,17 @@ public class IoTAgent {
         logger.info(node.getId());        
     }//EoM
 
+    @Bean
+    public Executor asyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("GithubLookup-");
+        executor.initialize();
+        return executor;
+    }    
+    
     @Value("${spring.profiles.active}")    
     public void setActiveProfile(String activeprofile){
         activeProfile = activeprofile;

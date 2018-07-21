@@ -119,13 +119,13 @@
                             <goal>build</goal>
                         </goals>
                     </execution>
-                    <execution>
+<!--                    <execution>
                         <id>docker:start</id>
                         <phase>install</phase>
                         <goals>
                             <goal>start</goal>
                         </goals>
-                    </execution>
+                    </execution>-->
                 </executions>
             </plugin>          
         </plugins>

@@ -1,6 +1,7 @@
 package eu.orchestrator.iotstack.iotagent.scheduled;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
+import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
 import eu.orchestrator.iotstack.iotagent.dao.ServiceManager;
 import eu.orchestrator.iotstack.iotagent.exception.AgentException;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 public class ScheduledTasks {
-
+    //Rule of thump: All business logic of schedulers should be implemented as Async. A blocking method blocks the entire thread
     private static final Logger logger = Logger.getLogger(ScheduledTasks.class.getName());
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -32,12 +33,34 @@ public class ScheduledTasks {
     NodeRepository noderepo;
     @Autowired
     ServiceManager srvmanager;
+    @Autowired
+    AsyncExecutors async;
 
-//    @Scheduled(fixedRate = 5000)
-//    public void reportCurrentTime() {
-//        logger.info("The time is now {}" + dateFormat.format(new Date()) + IoTAgent.activeProfile);
-//    }//EoM
-    
+    @Scheduled(fixedRate = 3000)
+    public void test1() {
+        logger.info("T1-The time is now {}" + dateFormat.format(new Date()) + IoTAgent.activeProfile);
+        for (int i = 0; i < 10; i++) {
+            try {
+                async.do1("12");
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ScheduledTasks.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//EoM
+
+//    @Scheduled(fixedRate = 3000)
+//    public void test2() {
+//        logger.info("T2-The time is now {}" + dateFormat.format(new Date()) + IoTAgent.activeProfile);        
+//        for (int i = 0; i < 10; i++) {
+//            try {
+//                async.do2("");
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(ScheduledTasks.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+//
+//    }//EoM    
+
     @Scheduled(fixedRate = 10000)
     public void scanLayer2Neighborhood() {
         try {
@@ -53,8 +76,6 @@ public class ScheduledTasks {
         }
 
     }//EoM
-
-
 
 //    @Scheduled(fixedRate = 5000)
 //    public void broadcastClusterHead() {
