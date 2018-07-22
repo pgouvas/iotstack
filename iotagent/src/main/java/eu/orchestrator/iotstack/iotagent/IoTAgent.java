@@ -6,6 +6,7 @@ import eu.orchestrator.iotstack.transfer.Node;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -25,33 +26,42 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class IoTAgent {
 
     private static final Logger logger = Logger.getLogger(IoTAgent.class.getName());
-    
-    //It represents the current profile. it can be clusterhead or node  i.e. 
-    //    mvn spring-boot:run -Dspring-boot.run.profiles=clusterhead
-    //    java -jar iotagent-1.0-SNAPSHOT-spring-boot.jar --spring.profiles.active=clusterhead
-    
+
+    //  The profile should be provided during the boot of the microservice
+    //  mvn spring-boot:run -Dspring-boot.run.profiles=gateway/node
+    //  java -jar iotagent-1.0-SNAPSHOT-spring-boot.jar --spring.profiles.active=gateway/node
+    public static final String osname = System.getProperty("os.name");
+    public static final String osarch = System.getProperty("os.arch");
+
     public static String activeProfile;
     //The node identifier of the Agent
     public static String nodeid;
-    //The configured Clusterhead
-    public String clusterhead;
-    
+    //The configured Gateway
+    public String gateway;
+
     @Autowired
     NodeRepository noderepo;
     
     public static void main(String[] args) {
         SpringApplication.run(IoTAgent.class, args);
-        logger.info("PROFILE:  "+ activeProfile);
-        
+        logger.info("nodeid: " + nodeid + " profile:  " + activeProfile + " osname: " + osname + " osarch: " + osarch);
+
         //check profile
-        if (activeProfile==null || !(activeProfile.equalsIgnoreCase("clusterhead") || activeProfile.equalsIgnoreCase("node")) ) {
-            logger.log(Level.SEVERE,"Agent requires a specific profile e.g. mvn spring-boot:run -Dspring-boot.run.profiles=clusterhead/node");
+        if (activeProfile == null || !(activeProfile.equalsIgnoreCase("gateway") || activeProfile.equalsIgnoreCase("node"))) {
+            logger.log(Level.SEVERE, "Agent requires a specific profile e.g. mvn spring-boot:run -Dspring-boot.run.profiles=gateway/node");
             System.exit(0);
-        }        
+        }
         //check that NodeID is already configured
-        Node node = Util.getNodeStatus();
-        //noderepo.insert(node);
-        logger.info(node.getId());        
+//        Node node = Util.getNodeInfo();
+//        noderepo.insert(node);            
+    }//EoM
+
+    @PostConstruct
+    public void init() {
+        Node node = Util.getNodeInfo();
+        nodeid = node.getId();
+        noderepo.insert(node);         
+        logger.info("Initialization Finished!");
     }//EoM
 
     @Bean
@@ -63,15 +73,15 @@ public class IoTAgent {
         executor.setThreadNamePrefix("GithubLookup-");
         executor.initialize();
         return executor;
-    }    
-    
-    @Value("${spring.profiles.active}")    
-    public void setActiveProfile(String activeprofile){
+    }
+
+    @Value("${spring.profiles.active}")
+    public void setActiveProfile(String activeprofile) {
         activeProfile = activeprofile;
     }
-    
-    public static boolean isClusterHead(){
-        return IoTAgent.activeProfile.equalsIgnoreCase("clusterhead");
+
+    public static boolean isGateway() {
+        return IoTAgent.activeProfile.equalsIgnoreCase("gateway");
     }
-    
+
 }//EoC

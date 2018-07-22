@@ -1,7 +1,6 @@
 package eu.orchestrator.iotstack.transfer;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -10,8 +9,10 @@ import java.util.List;
 public class Node {
 
     private String id;
-    private List<Peer> peers;
-    private Date lastupdate;
+    private String gateway;
+    private String osarch;
+    private String osname;    
+    private Date bootdate;
     
     public Node() {
     }    
@@ -20,44 +21,44 @@ public class Node {
         this.id = id;
     }
 
-    public Node(String id, List<Peer> peers) {
-        this.id = id;
-        this.peers = peers;
-    }    
-
-    public Node(String id, List<Peer> peers, Date lastupdate) {
-        this.id = id;
-        this.peers = peers;
-        this.lastupdate = lastupdate;
-    }    
-    
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public List<Peer> getPeers() {
-        return peers;
-    }
-
-    public void setPeers(List<Peer> peers) {
-        this.peers = peers;
-    }
-
-    public Date getLastupdate() {
-        return lastupdate;
-    }
-
-    public void setLastupdate(Date lastupdate) {
-        this.lastupdate = lastupdate;
     }    
     
-    @Override
-    public String toString() {
-        return "Node{" + "id=" + id + ", peers=" + peers + '}';
-    }    
-    
+    public Date getBootdate() {
+        return bootdate;
+    }
+
+    public void setBootdate(Date bootdate) {
+        this.bootdate = bootdate;
+    }
+
+    public String getGateway() {
+        return gateway;
+    }
+
+    public void setGateway(String gateway) {
+        this.gateway = gateway;
+    }
+
+    public String getOsarch() {
+        return osarch;
+    }
+
+    public void setOsarch(String osarch) {
+        this.osarch = osarch;
+    }
+
+    public String getOsname() {
+        return osname;
+    }
+
+    public void setOsname(String osname) {
+        this.osname = osname;
+    }
+            
 }

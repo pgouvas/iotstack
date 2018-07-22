@@ -1,10 +1,12 @@
 package eu.orchestrator.iotstack.iotagent.util;
 
+import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.transfer.Node;
 import eu.orchestrator.iotstack.transfer.Peer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -19,26 +21,13 @@ public class Util {
 
     private static final Logger logger = Logger.getLogger(Util.class.getName());
 
-    public static Node getNodeStatus() {
-        String output = executeCommand("cat status");           //cat status
-        String nodeid = "";
-        List<Peer> peers = new ArrayList<>();
-        //get node metadata
-        int pivot = output.indexOf("NODE") + 5;
-        nodeid = output.substring(pivot, output.indexOf("\n", pivot));
-//        logger.info("NodeId: " + nodeid);
-        String remaining = output.substring(pivot + nodeid.length(), output.length());
-        //logger.info("remaining: "+remaining);
-        Pattern pattern = Pattern.compile("[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}");
-        Matcher matcher = pattern.matcher(remaining);
-        while (matcher.find()) {
-            String peerstr = matcher.group();
-            Peer peer = new Peer(nodeid, peerstr, null);
-            peers.add(peer);
+    public static String GetCommandStatus() {
+        String cmd = "status";
+        if (IoTAgent.osname.equalsIgnoreCase("Linux") && IoTAgent.osarch.equalsIgnoreCase("amd64")) {
+            cmd = "cat status";
         }
-        Node nd = new Node(nodeid, peers);
-        return nd;
-    }//EoM
+        return cmd;
+    }
 
     public static String executeCommand(String command) {
         StringBuffer output = new StringBuffer();
@@ -55,7 +44,45 @@ public class Util {
             e.printStackTrace();
         }
         return output.toString();
+    }//EoM    
+    
+    public static List<Peer> getNeighbors() {
+        String output = executeCommand(GetCommandStatus());
+        String nodeid = "";
+        List<Peer> peers = new ArrayList<>();
+        //get node metadata
+        int pivot = output.indexOf("NODE") + 5;
+        nodeid = output.substring(pivot, output.indexOf("\n", pivot));
+//        logger.info("NodeId: " + nodeid);
+        String remaining = output.substring(pivot + nodeid.length(), output.length());
+        //logger.info("remaining: "+remaining);
+        Pattern pattern = Pattern.compile("[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}");
+        Matcher matcher = pattern.matcher(remaining);
+        Date now = new Date();
+        while (matcher.find()) {
+            String peerstr = matcher.group();
+            Peer peer = new Peer(nodeid, peerstr, now);
+            peers.add(peer);
+        }
+        return peers;
+    }//EoM      
+
+    public static Node getNodeInfo() {
+        String output = executeCommand(GetCommandStatus());
+        String nodeid = "";
+        List<Peer> peers = new ArrayList<>();
+        //get node metadata
+        int pivot = output.indexOf("NODE") + 5;
+        nodeid = output.substring(pivot, output.indexOf("\n", pivot));
+        Node node = new Node(nodeid);
+        if (IoTAgent.isGateway()) node.setGateway(nodeid);
+        node.setOsarch(IoTAgent.osarch);
+        node.setOsname(IoTAgent.osname);
+        node.setBootdate(new Date());
+        return node;
     }//EoM
+
+
 
     public static String invokeRest(String ipv6) {
         RestTemplate restTemplate = new RestTemplate();

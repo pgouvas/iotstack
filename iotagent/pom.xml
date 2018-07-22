@@ -94,7 +94,7 @@
                                     </inline>
                                 </assembly>
                                 <env>
-                                    <PROFILE>clusterhead</PROFILE>
+                                    <PROFILE>gateway</PROFILE>
                                 </env>
                                 <cmd>
                                     <shell>java -jar maven/${project.artifactId}-${project.version}-spring-boot.jar --spring.profiles.active=$PROFILE</shell>

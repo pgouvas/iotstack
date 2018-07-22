@@ -26,7 +26,11 @@ public class NodeRepository {
         public Node mapRow(ResultSet rs, int rowNum) throws SQLException {
             Node node = new Node();
             node.setId(rs.getString("id"));
-            node.setLastupdate(rs.getDate("lastupdate"));
+            node.setGateway(rs.getString("gateway"));
+            node.setOsarch(rs.getString("osarch"));
+            node.setOsname(rs.getString("osname"));
+            node.setBootdate(rs.getDate("bootdate"));
+            
             return node;
         }//mapRaw         
     }//EoC 
@@ -35,23 +39,23 @@ public class NodeRepository {
         return jdbcTemplate.query("select * from node", new NodeRowMapper());
     }//EoM
 
-    public Node findById(long id) {
+    public Node findById(String id) {
         return jdbcTemplate.queryForObject("select * from node where id=?", new Object[]{id},
                 new BeanPropertyRowMapper<Node>(Node.class));
     }
 
-    public int deleteById(long id) {
+    public int deleteById(String id) {
         return jdbcTemplate.update("delete from node where id=?", new Object[]{id});
     }
 
     public int insert(Node node) {
-        return jdbcTemplate.update("insert into node (id,lastupdate) " + "values(?,?)",
-                new Object[]{node.getId(), node.getLastupdate()});
+        return jdbcTemplate.update("insert into node (id,gateway,osarch,osname,bootdate) " + "values(?,?,?,?,?)",
+                new Object[]{node.getId(), node.getGateway(), node.getOsarch(), node.getOsname(), node.getBootdate() });
     }
 
     public int update(Node node) {
-        return jdbcTemplate.update("update node " + " set id = ? where id = ?",
-                new Object[]{node.getId()});
+        return jdbcTemplate.update("update node " + " set id = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ? where id = ?",
+                new Object[]{node.getId() , node.getGateway() , node.getOsarch() , node.getOsname() , node.getBootdate() , node.getId() });
     }
 
 }//EoC
