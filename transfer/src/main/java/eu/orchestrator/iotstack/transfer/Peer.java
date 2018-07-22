@@ -11,7 +11,8 @@ public class Peer {
     private String fromnode;
     private String tonode;
     private Date registrationdate;
-
+    private String reportingnode;
+    
     public Peer() {
     }
 
@@ -26,7 +27,12 @@ public class Peer {
         this.registrationdate = registrationdate;
     }
 
-    
+    public Peer(String fromnode, String tonode, Date registrationdate, String reportingnode) {
+        this.fromnode = fromnode;
+        this.tonode = tonode;
+        this.registrationdate = registrationdate;
+        this.reportingnode = reportingnode;
+    }    
     
     public String getFromnode() {
         return fromnode;
@@ -52,7 +58,13 @@ public class Peer {
         this.registrationdate = registrationdate;
     }
 
-    
+    public String getReportingnode() {
+        return reportingnode;
+    }
+
+    public void setReportingnode(String reportingnode) {
+        this.reportingnode = reportingnode;
+    }    
 
     @Override
     public int hashCode() {
@@ -82,6 +94,10 @@ public class Peer {
         }
         return true;
     }
-    
+
+    @Override
+    public String toString() {
+        return "Peer{" + "fromnode=" + fromnode + ", tonode=" + tonode + '}';
+    }    
    
 }

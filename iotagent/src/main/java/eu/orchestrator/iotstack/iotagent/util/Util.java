@@ -45,7 +45,8 @@ public class Util {
         }
         return output.toString();
     }//EoM    
-    
+
+    //TODO eliminate doubles
     public static List<Peer> getNeighbors() {
         String output = executeCommand(GetCommandStatus());
         String nodeid = "";
@@ -61,9 +62,13 @@ public class Util {
         Date now = new Date();
         while (matcher.find()) {
             String peerstr = matcher.group();
-            Peer peer = new Peer(nodeid, peerstr, now);
-            peers.add(peer);
-        }
+            Peer peer = new Peer(nodeid, peerstr, now, IoTAgent.nodeid);
+            if (!peers.contains(peer)){                
+                peers.add(peer);
+            } else {
+                logger.info("Ignored peer: "+peer +" as double");
+            }
+        }//while
         return peers;
     }//EoM      
 
@@ -75,14 +80,14 @@ public class Util {
         int pivot = output.indexOf("NODE") + 5;
         nodeid = output.substring(pivot, output.indexOf("\n", pivot));
         Node node = new Node(nodeid);
-        if (IoTAgent.isGateway()) node.setGateway(nodeid);
+        if (IoTAgent.isGateway()) {
+            node.setGateway(nodeid);
+        }
         node.setOsarch(IoTAgent.osarch);
         node.setOsname(IoTAgent.osname);
         node.setBootdate(new Date());
         return node;
     }//EoM
-
-
 
     public static String invokeRest(String ipv6) {
         RestTemplate restTemplate = new RestTemplate();

@@ -22,8 +22,8 @@ public class DBManager {
     PeerRepository peerrepo; 
     
     @Transactional    //(rollbackFor = AgentException.class)
-    public void updateNeighbor(List<Peer> addlist, List<Peer> dellist)  {
-        logger.info("updateNeighbor additions: "+addlist.size() +" deletions: "+dellist.size());
+    public void updatePeers(List<Peer> addlist, List<Peer> dellist)  {
+        logger.info("updatePeers additions: "+addlist.size() +" deletions: "+dellist.size());
         for (Peer peer : dellist) {
             peerrepo.deleteById(peer.getFromnode(), peer.getTonode());
         }

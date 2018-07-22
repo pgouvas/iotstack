@@ -1,6 +1,11 @@
 package eu.orchestrator.iotstack.iotagent.rest;
 
+import eu.orchestrator.iotstack.iotagent.IoTAgent;
+import eu.orchestrator.iotstack.iotagent.dao.DBManager;
+import eu.orchestrator.iotstack.transfer.CommandUpdatePeers;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,27 +19,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class RestAgentController {
 
     private static final Logger logger = Logger.getLogger(RestAgentController.class.getName());
-    
-    @RequestMapping(value="/nodeid",method = RequestMethod.GET)
-    public String index() {
-        return "";
+
+    @Autowired
+    DBManager dbmanager;
+
+    @RequestMapping(value = "/nodeid", method = RequestMethod.GET)
+    public String getNodeid() {
+        return IoTAgent.nodeid;
     }
 
-    @RequestMapping(value="/echo",method = RequestMethod.GET)
+    @RequestMapping(value = "/echo", method = RequestMethod.GET)
     public String echo() {
-        logger.info("Echo request received");
+        logger.info("Echo received");
         return "echo";
     }
-    
-    @RequestMapping(value="/clusterhead",method = RequestMethod.GET)
-    public String getClusterhead() {
-        return "";
-    }
-    
-    @RequestMapping(value="/clusterhead",method = RequestMethod.POST)
-    public String setClusterhead() {
-        return "";
-    }    
-    
-    
+
+    @RequestMapping(value = "/peers", method = RequestMethod.POST)
+    public String updatePeers(@RequestBody CommandUpdatePeers updatecommand) {
+        logger.info("Rest updatePeers received");
+        dbmanager.updatePeers(updatecommand.getAddlist(), updatecommand.getDellist());
+        logger.info("Rest updatePeers executed");
+        return "ok";
+    }//EoM
+
 }//EoC
