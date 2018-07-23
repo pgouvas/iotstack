@@ -18,3 +18,11 @@ CREATE TABLE peer
    registrationdate timestamp,
    reposrtingnode varchar(40)
 );
+
+
+CREATE TABLE commandlog
+(
+   cid varchar(40) not null,
+   cdate timestamp, 
+   primary key(id)
+);

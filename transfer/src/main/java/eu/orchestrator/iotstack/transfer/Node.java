@@ -1,6 +1,7 @@
 package eu.orchestrator.iotstack.transfer;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  *
@@ -60,5 +61,29 @@ public class Node {
     public void setOsname(String osname) {
         this.osname = osname;
     }
-            
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Node other = (Node) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }         
+    
 }

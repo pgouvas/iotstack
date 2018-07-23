@@ -24,9 +24,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableScheduling
 @SpringBootApplication
 public class IoTAgent {
-
+    
+    //TODO prevent double entries in peers
     //TODO implement notifier
-    //TODO implement forwardedwithout broadcasting
+    //TODO implement Gateway Forwarding without broadcasting
     //TODO implement reporterid to peer
     //TODO implement gateway keepalive listener    
     

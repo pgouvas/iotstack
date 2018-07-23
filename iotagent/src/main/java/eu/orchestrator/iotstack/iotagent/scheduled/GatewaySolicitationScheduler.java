@@ -3,7 +3,7 @@ package eu.orchestrator.iotstack.iotagent.scheduled;
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
-import eu.orchestrator.iotstack.transfer.CommandUpdateGateway;
+import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
 import eu.orchestrator.iotstack.transfer.Node;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,7 +34,7 @@ public class GatewaySolicitationScheduler {
     public void broadcastGateway() {
         logger.info("broadcastGateway: " + dateFormat.format(new Date()));        
         if (IoTAgent.isGateway()) {
-            CommandUpdateGateway cug = new CommandUpdateGateway(IoTAgent.nodeid);
+            CommandBroadcastUpdateGateway cug = new CommandBroadcastUpdateGateway(IoTAgent.nodeid,IoTAgent.nodeid,IoTAgent.nodeid);
             List<Node> adjacentnodes = peerrepo.getAdjacentNodes(IoTAgent.nodeid);
             for (Node adjacentnode : adjacentnodes) {
                 async.notifyAdjacentNodesForGateway(cug,adjacentnode.getId());                

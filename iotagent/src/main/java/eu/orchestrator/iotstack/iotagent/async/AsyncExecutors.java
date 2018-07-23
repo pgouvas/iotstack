@@ -2,10 +2,9 @@ package eu.orchestrator.iotstack.iotagent.async;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
-import eu.orchestrator.iotstack.transfer.CommandUpdateGateway;
-import eu.orchestrator.iotstack.transfer.CommandUpdatePeers;
+import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
+import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Node;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -26,7 +25,7 @@ public class AsyncExecutors {
     NodeRepository noderepo;
 
     @Async
-    public void notifyGatewayForPeerChanges(CommandUpdatePeers cup) {
+    public void notifyGatewayForPeerChanges(CommandUnicastUpdatePeers cup) {
         Node node = noderepo.findById(IoTAgent.nodeid);
         String gateway = node.getGateway();
         logger.info("Notifying gateway " + gateway + "  for insertions: " + cup.getAddlist().size() + " deletions " + cup.getDellist().size());
@@ -44,7 +43,7 @@ public class AsyncExecutors {
     }//EoM
 
     @Async
-    public void notifyAdjacentNodesForGateway(CommandUpdateGateway cug, String targetid) {
+    public void notifyAdjacentNodesForGateway(CommandBroadcastUpdateGateway cug, String targetid) {
         logger.info("Notifying notifyAdjacentNodesForGateway " + targetid + "  for gateway: " + cug.getGatewayid());
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://[" + targetid + "]:8080/api/v1/gateway";

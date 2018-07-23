@@ -4,16 +4,17 @@ package eu.orchestrator.iotstack.transfer;
  *
  * @author Panagiotis Gouvas
  */
-public class CommandUpdateGateway {
-    
+public class CommandBroadcastUpdateGateway extends BroadcastCommand{
+ 
     private String gatewayid;
 
-    public CommandUpdateGateway() {
+    public CommandBroadcastUpdateGateway() {
     }
 
-    public CommandUpdateGateway(String gatewayid) {
+    public CommandBroadcastUpdateGateway(String initid, String solicitorid,String gatewayid) {
+        super(initid, solicitorid);
         this.gatewayid = gatewayid;
-    }    
+    }
     
     public String getGatewayid() {
         return gatewayid;
@@ -21,6 +22,6 @@ public class CommandUpdateGateway {
 
     public void setGatewayid(String gatewayid) {
         this.gatewayid = gatewayid;
-    }
+    }  
     
 }//EoC

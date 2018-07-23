@@ -4,7 +4,7 @@ import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
 import eu.orchestrator.iotstack.iotagent.util.Util;
-import eu.orchestrator.iotstack.transfer.CommandUpdatePeers;
+import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Peer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class PeerUpdateScheduler {
             //update database
             dbmanager.updatePeers(addlist, dellist);
             //notify gateway
-            CommandUpdatePeers cup = new CommandUpdatePeers(addlist, dellist);
+            CommandUnicastUpdatePeers cup = new CommandUnicastUpdatePeers(addlist, dellist);
             async.notifyGatewayForPeerChanges(cup);
         }
     }//EoM

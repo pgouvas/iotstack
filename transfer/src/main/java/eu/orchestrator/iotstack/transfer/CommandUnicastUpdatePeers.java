@@ -1,24 +1,23 @@
 package eu.orchestrator.iotstack.transfer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author Panagiotis Gouvas
  */
-public class CommandUpdatePeers {
+public class CommandUnicastUpdatePeers {
 
-    List<Peer> addlist;
-    List<Peer> dellist;
+    private List<Peer> addlist;
+    private List<Peer> dellist;
 
-    public CommandUpdatePeers() {
-    }    
+    public CommandUnicastUpdatePeers() {
+    }
     
-    public CommandUpdatePeers(List<Peer> addlist, List<Peer> dellist) {
+    public CommandUnicastUpdatePeers(List<Peer> addlist, List<Peer> dellist) {
         this.addlist = addlist;
         this.dellist = dellist;
-    }    
+    }
     
     public List<Peer> getAddlist() {
         return addlist;
