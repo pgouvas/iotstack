@@ -40,6 +40,7 @@ public class PeerUpdateScheduler {
         List<Peer> existinglist = peerrepo.findAll();
         List<Peer> addlist = new ArrayList<>();
         List<Peer> dellist = new ArrayList<>();
+        //prevent doubles logic
         for (Peer newpeer : freshlist) {
             if (!existinglist.contains(newpeer)) {
                 addlist.add(newpeer);

@@ -35,13 +35,13 @@ public class CommandlogRepository {
         return jdbcTemplate.query("select * from commandlog", new CommandlogRowMapper());
     }//EoM
 
-    public Commandlog findById(String id) {
-        return jdbcTemplate.queryForObject("select * from commandlog where id=?", new Object[]{id},
-                new BeanPropertyRowMapper<Commandlog>(Commandlog.class));
+    public List<Commandlog> findById(String id) {
+        return jdbcTemplate.query("select * from commandlog where cid=?", new Object[]{id},
+                new CommandlogRowMapper());
     }//EoM
 
     public int deleteById(String id) {
-        return jdbcTemplate.update("delete from commandlog where id=?", new Object[]{id});
+        return jdbcTemplate.update("delete from commandlog where cid=?", new Object[]{id});
     }//EoM
 
     public int insert(Commandlog clog) {

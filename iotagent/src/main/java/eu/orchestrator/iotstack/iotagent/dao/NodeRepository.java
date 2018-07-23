@@ -30,6 +30,9 @@ public class NodeRepository {
             node.setOsarch(rs.getString("osarch"));
             node.setOsname(rs.getString("osname"));
             node.setBootdate(rs.getDate("bootdate"));
+            node.setVcpus(rs.getInt("vcpus"));
+            node.setCpuspeed(rs.getInt("cpuspeed"));
+            node.setTotalmemory(rs.getInt("totalmemory"));       
             
             return node;
         }//mapRaw         
@@ -49,8 +52,8 @@ public class NodeRepository {
     }//EoM
 
     public int insert(Node node) {
-        return jdbcTemplate.update("insert into node (id,gateway,osarch,osname,bootdate) " + "values(?,?,?,?,?)",
-                new Object[]{node.getId(), node.getGateway(), node.getOsarch(), node.getOsname(), node.getBootdate() });
+        return jdbcTemplate.update("insert into node (id,gateway,osarch,osname,bootdate,vcpus,cpuspeed,totalmemory ) " + "values(?,?,?,?,?,?,?,?)",
+                new Object[]{node.getId(), node.getGateway(), node.getOsarch(), node.getOsname(), node.getBootdate(), node.getVcpus(), node.getCpuspeed(), node.getTotalmemory() });
     }//EoM
 
     public int update(Node node) {

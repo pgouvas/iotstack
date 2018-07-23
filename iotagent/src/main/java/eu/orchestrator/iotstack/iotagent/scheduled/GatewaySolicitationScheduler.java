@@ -2,6 +2,8 @@ package eu.orchestrator.iotstack.iotagent.scheduled;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
+import eu.orchestrator.iotstack.iotagent.dao.Commandlog;
+import eu.orchestrator.iotstack.iotagent.dao.CommandlogRepository;
 import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
 import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
 import eu.orchestrator.iotstack.transfer.Node;
@@ -26,7 +28,8 @@ public class GatewaySolicitationScheduler {
 
     @Autowired
     PeerRepository peerrepo;
-    
+    @Autowired
+    CommandlogRepository clrepo;    
     @Autowired
     AsyncExecutors async;
 
@@ -34,7 +37,10 @@ public class GatewaySolicitationScheduler {
     public void broadcastGateway() {
         logger.info("broadcastGateway: " + dateFormat.format(new Date()));        
         if (IoTAgent.isGateway()) {
+            //Each creation of broadcast is accompanied by log entry
             CommandBroadcastUpdateGateway cug = new CommandBroadcastUpdateGateway(IoTAgent.nodeid,IoTAgent.nodeid,IoTAgent.nodeid);
+            clrepo.insert(new Commandlog(cug.getCid(), new Date()));
+            logger.info("Broadcast "+cug.getCid()+" created and ready to be sent");
             List<Node> adjacentnodes = peerrepo.getAdjacentNodes(IoTAgent.nodeid);
             for (Node adjacentnode : adjacentnodes) {
                 async.notifyAdjacentNodesForGateway(cug,adjacentnode.getId());                

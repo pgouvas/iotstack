@@ -14,6 +14,10 @@ public class Node {
     private String osarch;
     private String osname;    
     private Date bootdate;
+    private int vcpus;
+    private int cpuspeed;
+    private int totalmemory;    
+    
     
     public Node() {
     }    
@@ -62,6 +66,30 @@ public class Node {
         this.osname = osname;
     }
 
+    public int getVcpus() {
+        return vcpus;
+    }
+
+    public void setVcpus(int vcpus) {
+        this.vcpus = vcpus;
+    }
+
+    public int getCpuspeed() {
+        return cpuspeed;
+    }
+
+    public void setCpuspeed(int cpuspeed) {
+        this.cpuspeed = cpuspeed;
+    }
+
+    public int getTotalmemory() {
+        return totalmemory;
+    }
+
+    public void setTotalmemory(int totalmemory) {
+        this.totalmemory = totalmemory;
+    }    
+    
     @Override
     public int hashCode() {
         int hash = 5;

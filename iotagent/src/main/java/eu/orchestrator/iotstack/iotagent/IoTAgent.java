@@ -24,13 +24,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableScheduling
 @SpringBootApplication
 public class IoTAgent {
-    
-    //TODO prevent double entries in peers
-    //TODO implement notifier
-    //TODO implement Gateway Forwarding without broadcasting
+
+    //TODO implement credentials management
+    //TODO implement get resources
+    //TODO implement cleaner of commandlog-cleaner
     //TODO implement reporterid to peer
-    //TODO implement gateway keepalive listener    
-    
+    //TODO implement gateway keepalive listener
     private static final Logger logger = Logger.getLogger(IoTAgent.class.getName());
 
     //  The profile should be provided during the boot of the microservice
@@ -47,7 +46,7 @@ public class IoTAgent {
 
     @Autowired
     NodeRepository noderepo;
-    
+
     public static void main(String[] args) {
         SpringApplication.run(IoTAgent.class, args);
         logger.info("nodeid: " + nodeid + " profile:  " + activeProfile + " osname: " + osname + " osarch: " + osarch);
@@ -57,17 +56,21 @@ public class IoTAgent {
             logger.log(Level.SEVERE, "Agent requires a specific profile e.g. mvn spring-boot:run -Dspring-boot.run.profiles=gateway/node");
             System.exit(0);
         }
-        //check that NodeID is already configured
-//        Node node = Util.getNodeInfo();
-//        noderepo.insert(node);            
     }//EoM
 
     @PostConstruct
     public void init() {
         Node node = Util.getNodeInfo();
         nodeid = node.getId();
-        noderepo.insert(node);         
-        logger.info("Initialization Finished!");
+        int vcpus = Util.getVCPUs();
+        int cpuspeed = Util.getCPUSpeed();
+        int totalmemory = Util.getMemorysize();
+        node.setVcpus(vcpus);
+        node.setCpuspeed(cpuspeed);
+        node.setTotalmemory(totalmemory);
+        //persist to database
+        noderepo.insert(node);
+        logger.info("Initialization finished for " + nodeid + " VCPUs: " + vcpus + " cpuspeed: " + cpuspeed + " totalmemory: " + totalmemory);
     }//EoM
 
     @Bean

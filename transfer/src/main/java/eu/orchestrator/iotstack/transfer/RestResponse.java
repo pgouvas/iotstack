@@ -6,33 +6,33 @@ package eu.orchestrator.iotstack.transfer;
  */
 public class RestResponse {
 
-    private int rescode;            //200 ok
+    private ResponseCode rescode;            //200 ok
     private String message;
     private Object resobject;
 
     public RestResponse() {
     }
             
-    public RestResponse(int rescode) {
+    public RestResponse(ResponseCode rescode) {
         this.rescode = rescode;
     }
 
-    public RestResponse(int rescode, String message) {
+    public RestResponse(ResponseCode rescode, String message) {
         this.rescode = rescode;
         this.message = message;
     }
 
-    public RestResponse(int rescode, String message, Object resobject) {
+    public RestResponse(ResponseCode rescode, String message, Object resobject) {
         this.rescode = rescode;
         this.message = message;
         this.resobject = resobject;
     }    
     
-    public int getRescode() {
+    public ResponseCode getRescode() {
         return rescode;
     }    
     
-    public void setRescode(int rescode) {
+    public void setRescode(ResponseCode rescode) {
         this.rescode = rescode;
     }
 

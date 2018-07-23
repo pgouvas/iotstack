@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS node;
 DROP TABLE IF EXISTS peer;
+DROP TABLE IF EXISTS commandlog;
 
 CREATE TABLE node
 (
@@ -8,6 +9,11 @@ CREATE TABLE node
    osarch varchar(40),
    osname varchar(40),
    bootdate timestamp, 
+   username varchar(40),
+   password varchar(40),
+   vcpus integer,
+   cpuspeed integer,
+   totalmemory integer,
    primary key(id)
 );
 
@@ -24,5 +30,5 @@ CREATE TABLE commandlog
 (
    cid varchar(40) not null,
    cdate timestamp, 
-   primary key(id)
+   primary key(cid)
 );

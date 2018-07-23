@@ -7,6 +7,7 @@ import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Credentials;
 import eu.orchestrator.iotstack.transfer.InstanceModel;
 import eu.orchestrator.iotstack.transfer.ResourceModel;
+import eu.orchestrator.iotstack.transfer.ResponseCode;
 import eu.orchestrator.iotstack.transfer.RestResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class RestAgentController {
     @RequestMapping(value = "/peers", method = RequestMethod.POST)
     public String updatePeers(@RequestBody CommandUnicastUpdatePeers updatecommand) {
         logger.info("Rest updatePeers received");
-        dbmanager.updatePeers(updatecommand.getAddlist(), updatecommand.getDellist());  //effective only to gateway
+        dbmanager.updatePeers(updatecommand);  //effective only to gateway
         logger.info("Rest updatePeers executed");
         return "ok";
     }//EoM
@@ -54,17 +55,18 @@ public class RestAgentController {
     public String updateGateway(@RequestBody CommandBroadcastUpdateGateway cug) {
         logger.info("Rest updateGateway received");
         dbmanager.updateGateway(cug);
-        dbmanager.forwardupdateGatewayCommand(cug);
+//        dbmanager.forwardupdateGatewayCommand(cug);
         logger.info("Rest updateGateway executed");
         return "ok";
     }//EoM    
 
     //-----SPI logic in order to be integrated in the MAESTRO Orchestrator-----
+    
     @RequestMapping(value = "/validatecredentials", method = RequestMethod.POST)
     public RestResponse validatecredentials(@RequestBody Credentials credentials) {
         RestResponse response = new RestResponse();
         logger.info("Rest validatecredentials received");
-        response.setRescode(200);
+        response = dbmanager.validatecredentials(credentials);
         logger.info("Rest validatecredentials executed");
         return response;
     }//EoM      
@@ -74,7 +76,7 @@ public class RestAgentController {
         RestResponse response = new RestResponse();
         logger.info("Rest getinstances received");
         List<InstanceModel> instances = new ArrayList<>();
-        response.setRescode(200);
+        response.setRescode(ResponseCode.SUCCESS);
         response.setResobject(response);
         logger.info("Rest getinstances executed");
         return response;
@@ -84,7 +86,7 @@ public class RestAgentController {
     public RestResponse bootInstance(@RequestBody Credentials credentials,@RequestBody InstanceModel instance) {
         RestResponse response = new RestResponse();
         logger.info("Rest bootInstance received");
-        response.setRescode(200);
+        response.setRescode(ResponseCode.SUCCESS);
         logger.info("Rest bootInstance executed");
         return response;
     }//EoM      
@@ -93,7 +95,7 @@ public class RestAgentController {
     public RestResponse removeInstance(@RequestBody Credentials credentials,@PathVariable String instanceid) {
         RestResponse response = new RestResponse();
         logger.info("Rest removeInstance received");
-        response.setRescode(200);
+        response.setRescode(ResponseCode.SUCCESS);
         logger.info("Rest removeInstance executed");
         return response;
     }//EoM      
@@ -102,7 +104,7 @@ public class RestAgentController {
     public RestResponse getResources(@RequestBody Credentials credentials) {
         RestResponse response = new RestResponse();
         logger.info("Rest getResources received");
-        response.setRescode(200);
+        response.setRescode(ResponseCode.SUCCESS);
         List<ResourceModel> resources = new ArrayList<>();
         response.setResobject(resources);
         logger.info("Rest getResources executed");

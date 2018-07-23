@@ -21,15 +21,60 @@ public class Util {
 
     private static final Logger logger = Logger.getLogger(Util.class.getName());
 
-    public static String GetCommandStatus() {
-        String cmd = "status";
-        if (IoTAgent.osname.equalsIgnoreCase("Linux") && IoTAgent.osarch.equalsIgnoreCase("amd64")) {
-            cmd = "cat status";
-        }
+    private static final int COMMAND_GET_STATUS = 0;
+    private static final int COMMAND_GET_VCPUS = 1;
+    private static final int COMMAND_GET_CPUSPEED = 2;
+    private static final int COMMAND_GET_MEMORYSIZE = 3;
+    private static final int COMMAND_GET_DISKSIZE = 4;
+
+    //  lscpu | grep -E '^Thread|^Core|^Socket|^CPU\('
+    //  nproc --all
+    //  lscpu | grep "max MHz" | awk  '{print $4}' | cut -d'.' -f1   
+    //free -m | grep "Mem" | awk  '{print $2}'
+    public static String GetCommandStatus(int command) {
+        String cmd = "";
+
+        switch (command) {
+            case COMMAND_GET_STATUS:
+                cmd = "status";
+                if (IoTAgent.osname.equalsIgnoreCase("Linux") && IoTAgent.osarch.equalsIgnoreCase("amd64")) {
+                    cmd = "cat status";
+                }
+                break;
+            case COMMAND_GET_VCPUS:
+                cmd = "nproc --all";
+                break;
+
+            case COMMAND_GET_CPUSPEED:
+                cmd = "lscpu | grep 'max MHz' | awk  '{print $4}' | cut -d'.' -f1 ";
+                break;
+
+            case COMMAND_GET_MEMORYSIZE:
+                cmd = "free -m | grep 'Mem' | awk  '{print $2}' ";
+                break;
+
+            default:
+                break;
+        }//switch
+
         return cmd;
     }
 
-    public static String executeCommand(String command) {
+    public static String executeCommandSingleLineOutput(String command) {
+        StringBuffer output = new StringBuffer();
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(command);
+            p.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            output.append(reader.readLine());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return output.toString();
+    }//EoM        
+
+    public static String executeCommandMultiLineOutput(String command) {
         StringBuffer output = new StringBuffer();
         Process p;
         try {
@@ -46,9 +91,32 @@ public class Util {
         return output.toString();
     }//EoM    
 
-    //TODO eliminate doubles
+    public static int getVCPUs() {
+        int ret = 0;
+        String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_VCPUS));
+        logger.info("|" + output + "|");
+        ret = Integer.parseInt(output.trim());
+        return ret;
+    }//EoM
+
+    public static int getCPUSpeed() {
+        int ret = 0;
+        String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_CPUSPEED));
+        logger.info("|" + output + "|");
+        ret = Integer.parseInt(output.trim());
+        return ret;
+    }//EoM    
+
+    public static int getMemorysize() {
+        int ret = 0;
+        String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_MEMORYSIZE));
+        logger.info("|" + output + "|");
+        ret = Integer.parseInt(output.trim());
+        return ret;
+    }//EoM
+
     public static List<Peer> getNeighbors() {
-        String output = executeCommand(GetCommandStatus());
+        String output = executeCommandMultiLineOutput(GetCommandStatus(COMMAND_GET_STATUS));
         String nodeid = "";
         List<Peer> peers = new ArrayList<>();
         //get node metadata
@@ -63,9 +131,10 @@ public class Util {
         while (matcher.find()) {
             String peerstr = matcher.group();
             Peer peer = new Peer(nodeid, peerstr, now, IoTAgent.nodeid);
-            if (!peers.contains(peer)){                
+            if (!peers.contains(peer)) {
                 peers.add(peer);
             } else {
+                //Preventive policy for double peers
 //                logger.info("Ignored peer: "+peer +" as double");
             }
         }//while
@@ -73,7 +142,7 @@ public class Util {
     }//EoM      
 
     public static Node getNodeInfo() {
-        String output = executeCommand(GetCommandStatus());
+        String output = executeCommandMultiLineOutput(GetCommandStatus(COMMAND_GET_STATUS));
         String nodeid = "";
         List<Peer> peers = new ArrayList<>();
         //get node metadata
