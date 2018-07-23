@@ -2,6 +2,7 @@ package eu.orchestrator.iotstack.iotagent.async;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
+import eu.orchestrator.iotstack.transfer.CommandUpdateGateway;
 import eu.orchestrator.iotstack.transfer.CommandUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Node;
 import java.util.concurrent.CompletableFuture;
@@ -17,52 +18,43 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service
 public class AsyncExecutors {
+
     //All methods should be async
     private static final Logger logger = Logger.getLogger(AsyncExecutors.class.getName());
-    
+
     @Autowired
     NodeRepository noderepo;
-            
+
     @Async
     public void notifyGatewayForPeerChanges(CommandUpdatePeers cup) {
         Node node = noderepo.findById(IoTAgent.nodeid);
         String gateway = node.getGateway();
-        logger.info("Notifying gateway "+gateway + "  for insertions: "+cup.getAddlist().size()+" deletions "+cup.getDellist().size());
-        if ( (gateway!=null) && (!gateway.equalsIgnoreCase("")) ){
+        logger.info("Notifying gateway " + gateway + "  for insertions: " + cup.getAddlist().size() + " deletions " + cup.getDellist().size());
+        if ((gateway != null) && (!gateway.equalsIgnoreCase(""))) {
             RestTemplate restTemplate = new RestTemplate();
             String url = "http://[" + gateway + "]:8080/api/v1/peers";
             try {
-                logger.info("Performing rest");
-                restTemplate.postForObject(url, cup ,String.class);
-                logger.info("Response at " + gateway);
+                //logger.info("Performing rest");
+                restTemplate.postForObject(url, cup, String.class);
+                //logger.info("Response at " + gateway);
             } catch (Exception ex) {
                 logger.severe(ex.getMessage());
-            }            
+            }
         }
     }//EoM
-    
-    
-    //TODO build notifier
-    //TODO implement forwardedwithout broadcasting
-    //TODO implement reporterid to peer
-    //TODO implement gateway keepalive listener
-    @Async      
-    public void notifyNodeForGateway(CommandUpdatePeers cup) {
-        Node node = noderepo.findById(IoTAgent.nodeid);
-        String gateway = node.getGateway();
-        logger.info("Notifying gateway "+gateway + "  for insertions: "+cup.getAddlist().size()+" deletions "+cup.getDellist().size());
-        if ( (gateway!=null) && (!gateway.equalsIgnoreCase("")) ){
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "http://[" + gateway + "]:8080/api/v1/peers";
-            try {
-                logger.info("Performing rest");
-                restTemplate.postForObject(url, cup ,String.class);
-                logger.info("Response at " + gateway);
-            } catch (Exception ex) {
-                logger.severe(ex.getMessage());
-            }            
+
+    @Async
+    public void notifyAdjacentNodesForGateway(CommandUpdateGateway cug, String targetid) {
+        logger.info("Notifying notifyAdjacentNodesForGateway " + targetid + "  for gateway: " + cug.getGatewayid());
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://[" + targetid + "]:8080/api/v1/gateway";
+        try {
+            //logger.info("Performing rest");
+            restTemplate.postForObject(url, cug, String.class);
+            //logger.info("Response at " + targetid);
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
         }
     }//EoM    
-    
-    
+
 }//EoC

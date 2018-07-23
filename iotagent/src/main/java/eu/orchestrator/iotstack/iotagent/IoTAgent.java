@@ -25,6 +25,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @SpringBootApplication
 public class IoTAgent {
 
+    //TODO implement notifier
+    //TODO implement forwardedwithout broadcasting
+    //TODO implement reporterid to peer
+    //TODO implement gateway keepalive listener    
+    
     private static final Logger logger = Logger.getLogger(IoTAgent.class.getName());
 
     //  The profile should be provided during the boot of the microservice

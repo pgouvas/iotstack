@@ -66,7 +66,7 @@ public class Util {
             if (!peers.contains(peer)){                
                 peers.add(peer);
             } else {
-                logger.info("Ignored peer: "+peer +" as double");
+//                logger.info("Ignored peer: "+peer +" as double");
             }
         }//while
         return peers;

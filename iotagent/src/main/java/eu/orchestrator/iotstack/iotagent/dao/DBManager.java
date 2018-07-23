@@ -1,5 +1,7 @@
 package eu.orchestrator.iotstack.iotagent.dao;
 
+import eu.orchestrator.iotstack.iotagent.IoTAgent;
+import eu.orchestrator.iotstack.transfer.Node;
 import eu.orchestrator.iotstack.transfer.Peer;
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,4 +34,11 @@ public class DBManager {
         }        
     }//EoM
     
-}
+    @Transactional
+    public void updateGateway(String gatewayid){
+        Node node = noderepo.findById(IoTAgent.nodeid);
+        node.setGateway(gatewayid);
+        noderepo.update(node);
+    }//EoM
+    
+}//EoC

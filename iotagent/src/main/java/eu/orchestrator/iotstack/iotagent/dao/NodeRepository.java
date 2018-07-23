@@ -38,24 +38,24 @@ public class NodeRepository {
     public List<Node> findAll() {
         return jdbcTemplate.query("select * from node", new NodeRowMapper());
     }//EoM
-
+    
     public Node findById(String id) {
         return jdbcTemplate.queryForObject("select * from node where id=?", new Object[]{id},
                 new BeanPropertyRowMapper<Node>(Node.class));
-    }
+    }//EoM
 
     public int deleteById(String id) {
         return jdbcTemplate.update("delete from node where id=?", new Object[]{id});
-    }
+    }//EoM
 
     public int insert(Node node) {
         return jdbcTemplate.update("insert into node (id,gateway,osarch,osname,bootdate) " + "values(?,?,?,?,?)",
                 new Object[]{node.getId(), node.getGateway(), node.getOsarch(), node.getOsname(), node.getBootdate() });
-    }
+    }//EoM
 
     public int update(Node node) {
         return jdbcTemplate.update("update node " + " set id = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ? where id = ?",
                 new Object[]{node.getId() , node.getGateway() , node.getOsarch() , node.getOsname() , node.getBootdate() , node.getId() });
-    }
+    }//EoM
 
 }//EoC

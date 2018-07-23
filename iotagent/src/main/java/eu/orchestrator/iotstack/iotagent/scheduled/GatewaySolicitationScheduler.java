@@ -2,8 +2,9 @@ package eu.orchestrator.iotstack.iotagent.scheduled;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
-import eu.orchestrator.iotstack.iotagent.util.Util;
-import eu.orchestrator.iotstack.transfer.Peer;
+import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
+import eu.orchestrator.iotstack.transfer.CommandUpdateGateway;
+import eu.orchestrator.iotstack.transfer.Node;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -24,12 +25,20 @@ public class GatewaySolicitationScheduler {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     @Autowired
+    PeerRepository peerrepo;
+    
+    @Autowired
     AsyncExecutors async;
 
     @Scheduled(fixedRate = 5000)
     public void broadcastGateway() {
+        logger.info("broadcastGateway: " + dateFormat.format(new Date()));        
         if (IoTAgent.isGateway()) {
-            List<Peer> peers = Util.getNeighbors();
+            CommandUpdateGateway cug = new CommandUpdateGateway(IoTAgent.nodeid);
+            List<Node> adjacentnodes = peerrepo.getAdjacentNodes(IoTAgent.nodeid);
+            for (Node adjacentnode : adjacentnodes) {
+                async.notifyAdjacentNodesForGateway(cug,adjacentnode.getId());                
+            }//for
         }//if
     }//EoM
 

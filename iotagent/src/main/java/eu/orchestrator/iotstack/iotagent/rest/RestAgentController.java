@@ -2,6 +2,7 @@ package eu.orchestrator.iotstack.iotagent.rest;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
+import eu.orchestrator.iotstack.transfer.CommandUpdateGateway;
 import eu.orchestrator.iotstack.transfer.CommandUpdatePeers;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,4 +43,12 @@ public class RestAgentController {
         return "ok";
     }//EoM
 
+    @RequestMapping(value = "/gateway", method = RequestMethod.POST)
+    public String updateGateway(@RequestBody CommandUpdateGateway cug) {
+        logger.info("Rest updateGateway received");
+        dbmanager.updateGateway(cug.getGatewayid());
+        logger.info("Rest updateGateway executed");
+        return "ok";
+    }//EoM    
+    
 }//EoC

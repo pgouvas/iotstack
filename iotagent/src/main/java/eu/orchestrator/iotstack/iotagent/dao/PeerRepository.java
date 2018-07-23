@@ -1,5 +1,6 @@
 package eu.orchestrator.iotstack.iotagent.dao;
 
+import eu.orchestrator.iotstack.transfer.Node;
 import eu.orchestrator.iotstack.transfer.Peer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,6 +49,20 @@ public class PeerRepository {
     public int insert(Peer peer) {
         return jdbcTemplate.update("insert into peer (fromnode,tonode,registrationdate) " + "values(?,?,?)",
                 new Object[]{peer.getFromnode(), peer.getTonode(), peer.getRegistrationdate()});
+    }
+
+    class PeerNodeRowMapper implements RowMapper<Node> {
+
+        @Override
+        public Node mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Node node = new Node();
+            node.setId(rs.getString("tonode"));
+            return node;
+        }//mapRaw         
+    }//EoC     
+
+    public List<Node> getAdjacentNodes(String fromnode) {
+        return jdbcTemplate.query("select distinct tonode from peer where fromnode = ?", new Object[]{fromnode}, new PeerNodeRowMapper());
     }
 
 }//EoC
