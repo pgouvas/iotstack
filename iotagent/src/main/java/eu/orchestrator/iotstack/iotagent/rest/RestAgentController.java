@@ -61,7 +61,7 @@ public class RestAgentController {
 
     //-----SPI logic in order to be integrated in the MAESTRO Orchestrator-----
     @RequestMapping(value = "/validatecredentials", method = RequestMethod.POST)
-    public RestResponse validatecredentials(@RequestBody Credentials cred) {
+    public RestResponse validatecredentials(@RequestBody Credentials credentials) {
         RestResponse response = new RestResponse();
         logger.info("Rest validatecredentials received");
         response.setRescode(200);
@@ -70,7 +70,7 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/instances", method = RequestMethod.GET)
-    public RestResponse getinstances() {
+    public RestResponse getinstances(@RequestBody Credentials credentials) {
         RestResponse response = new RestResponse();
         logger.info("Rest getinstances received");
         List<InstanceModel> instances = new ArrayList<>();
@@ -81,7 +81,7 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/instance", method = RequestMethod.POST)
-    public RestResponse bootInstance(@RequestBody InstanceModel instance) {
+    public RestResponse bootInstance(@RequestBody Credentials credentials,@RequestBody InstanceModel instance) {
         RestResponse response = new RestResponse();
         logger.info("Rest bootInstance received");
         response.setRescode(200);
@@ -90,7 +90,7 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/instance/{instanceid}", method = RequestMethod.DELETE)
-    public RestResponse removeInstance(@PathVariable String instanceid) {
+    public RestResponse removeInstance(@RequestBody Credentials credentials,@PathVariable String instanceid) {
         RestResponse response = new RestResponse();
         logger.info("Rest removeInstance received");
         response.setRescode(200);
@@ -99,7 +99,7 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/resources", method = RequestMethod.GET)
-    public RestResponse getResources() {
+    public RestResponse getResources(@RequestBody Credentials credentials) {
         RestResponse response = new RestResponse();
         logger.info("Rest getResources received");
         response.setRescode(200);
