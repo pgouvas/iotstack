@@ -41,7 +41,12 @@ public class AsyncExecutors {
         }
     }//EoM
     
-    @Async
+    
+    //TODO build notifier
+    //TODO implement forwardedwithout broadcasting
+    //TODO implement reporterid to peer
+    //TODO implement gateway keepalive listener
+    @Async      
     public void notifyNodeForGateway(CommandUpdatePeers cup) {
         Node node = noderepo.findById(IoTAgent.nodeid);
         String gateway = node.getGateway();
