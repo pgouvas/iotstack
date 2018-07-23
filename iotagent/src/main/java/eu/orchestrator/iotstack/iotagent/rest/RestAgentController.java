@@ -52,7 +52,7 @@ public class RestAgentController {
         return "ok";
     }//EoM    
     
-    //--------------SPI logic in order to be integrated in the MAESTRO Orchestrator
+    //-----SPI logic in order to be integrated in the MAESTRO Orchestrator-----
     
     @RequestMapping(value = "/validatecredentials", method = RequestMethod.POST)
     public String validatecredentials(@RequestBody CommandBroadcastUpdateGateway cug) {
