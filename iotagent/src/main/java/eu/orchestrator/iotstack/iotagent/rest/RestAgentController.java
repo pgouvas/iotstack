@@ -10,6 +10,7 @@ import eu.orchestrator.iotstack.transfer.Nodestat;
 import eu.orchestrator.iotstack.transfer.ResourceModel;
 import eu.orchestrator.iotstack.transfer.ResponseCode;
 import eu.orchestrator.iotstack.transfer.RestResponse;
+import eu.orchestrator.iotstack.transfer.Topology;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -114,16 +115,27 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/resources", method = RequestMethod.GET)
-    public RestResponse getResources(@RequestBody Credentials credentials) {
+    public RestResponse getResources(@RequestBody Credentials credentials) {    
         RestResponse response = new RestResponse();
         logger.info("Rest getResources received");
+        ResourceModel resourcemodel = dbmanager.getResources();
         response.setRescode(ResponseCode.SUCCESS);
-        List<ResourceModel> resources = new ArrayList<>();
-        response.setResobject(resources);
+        response.setResobject(resourcemodel);
         logger.info("Rest getResources executed");
         return response;
     }//EoM      
 
+    @RequestMapping(value = "/topology", method = RequestMethod.GET)
+    public RestResponse getTopology(@RequestBody Credentials credentials) {                                 //
+        RestResponse response = new RestResponse();
+        logger.info("Rest getTopology received");
+        Topology topology = dbmanager.getTopology();
+        response.setRescode(ResponseCode.SUCCESS);
+        response.setResobject(topology);
+        logger.info("Rest getTopology executed");
+        return response;
+    }//EoM     
+    
 //    SPIResponse validateCredentials(CredentialsModel credentials);
 //    SPIResponse getInstances(CredentialsModel credentials);   //used to get the interal IPs of booted VMs/containers-components
 //    SPIResponse bootInstance(CredentialsModel credentials, ImageModel image, FlavorModel flavor, InstanceModel instance);     //spawn container business logic

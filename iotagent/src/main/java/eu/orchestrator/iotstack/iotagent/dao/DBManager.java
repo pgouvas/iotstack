@@ -8,8 +8,10 @@ import eu.orchestrator.iotstack.transfer.Credentials;
 import eu.orchestrator.iotstack.transfer.Node;
 import eu.orchestrator.iotstack.transfer.Nodestat;
 import eu.orchestrator.iotstack.transfer.Peer;
+import eu.orchestrator.iotstack.transfer.ResourceModel;
 import eu.orchestrator.iotstack.transfer.ResponseCode;
 import eu.orchestrator.iotstack.transfer.RestResponse;
+import eu.orchestrator.iotstack.transfer.Topology;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -116,7 +118,7 @@ public class DBManager {
         }
         return result;
     }//EoM
-    
+
     @Transactional
     public Nodestat getNodestats() {
         Node node = noderepo.findById(IoTAgent.nodeid).get(0);
@@ -133,14 +135,38 @@ public class DBManager {
         return nodestat;
     }//EoM
 
-    @Transactional    
+    @Transactional
     public void updateNodestat(Nodestat nodestat) {
-        logger.info("DBManager updating nodestats for "+nodestat.getNodeid());
-        if (nodestatrepo.findById(nodestat.getNodeid()).isEmpty()){
+        logger.info("DBManager updating nodestats for " + nodestat.getNodeid());
+        if (nodestatrepo.findById(nodestat.getNodeid()).isEmpty()) {
             nodestatrepo.insert(nodestat);
         } else {
             nodestatrepo.update(nodestat);
         }
+    }//EoM
+
+    @Transactional
+    public ResourceModel getResources() {
+        logger.info("getResources vcpus: " + nodestatrepo.getMaxVCPUs() +" ram: "+nodestatrepo.getMaxRam());
+        ResourceModel resourcemodel = new ResourceModel();
+        resourcemodel.setId(IoTAgent.nodeid);
+        resourcemodel.setMaxRam(nodestatrepo.getMaxRam());
+        resourcemodel.setMaxVCpus(nodestatrepo.getMaxVCPUs());
+        resourcemodel.setMaxInstances(0);
+        resourcemodel.setRunningInstances(0);
+        resourcemodel.setUsedRam(0);
+        resourcemodel.setUsedVCpus(0);
+        resourcemodel.setvCpuUtilization(0.0);
+        resourcemodel.setRamUtilization(0.0);
+        resourcemodel.setInstancesUtilization(0.0);
+        return resourcemodel;
+    }//EoM
+
+    @Transactional    
+    public Topology getTopology() {
+        Topology topology = new Topology();
+        topology.setPeers( peerrepo.findAll() );
+        return topology;
     }//EoM
 
 }//EoC
