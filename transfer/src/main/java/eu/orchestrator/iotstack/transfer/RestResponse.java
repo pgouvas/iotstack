@@ -1,14 +1,16 @@
 package eu.orchestrator.iotstack.transfer;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Panagiotis Gouvas
  */
-public class RestResponse {
+public class RestResponse<R> implements Serializable {
 
     private ResponseCode rescode;            //200 ok
     private String message;
-    private Object resobject;
+    private R resobject;
 
     public RestResponse() {
     }
@@ -22,7 +24,7 @@ public class RestResponse {
         this.message = message;
     }
 
-    public RestResponse(ResponseCode rescode, String message, Object resobject) {
+    public RestResponse(ResponseCode rescode, String message, R resobject) {
         this.rescode = rescode;
         this.message = message;
         this.resobject = resobject;
@@ -44,11 +46,11 @@ public class RestResponse {
         this.message = message;
     }
 
-    public Object getResobject() {
+    public R getResobject() {
         return resobject;
     }
 
-    public void setResobject(Object resobject) {
+    public void setResobject(R resobject) {
         this.resobject = resobject;
     }   
     

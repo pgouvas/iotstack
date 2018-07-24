@@ -33,9 +33,9 @@ public class GatewaySolicitationScheduler {
     @Autowired
     AsyncExecutors async;
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 60000)
     public void broadcastGateway() {
-        logger.info("broadcastGateway: " + dateFormat.format(new Date()));        
+        logger.info("broadcastGateway: " + dateFormat.format(new Date()));
         if (IoTAgent.isGateway()) {
             //Each creation of broadcast is accompanied by log entry
             CommandBroadcastUpdateGateway cug = new CommandBroadcastUpdateGateway(IoTAgent.nodeid,IoTAgent.nodeid,IoTAgent.nodeid);

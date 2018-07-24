@@ -1,12 +1,21 @@
 package eu.orchestrator.iotstack.iotagent.async;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
+import eu.orchestrator.iotstack.iotagent.dao.DBManager;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
 import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
 import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Node;
+import eu.orchestrator.iotstack.transfer.Nodestat;
+import eu.orchestrator.iotstack.transfer.ResponseCode;
+import eu.orchestrator.iotstack.transfer.RestResponse;
+import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -23,10 +32,12 @@ public class AsyncExecutors {
 
     @Autowired
     NodeRepository noderepo;
+    @Autowired
+    DBManager dbmanager;
 
     @Async
     public void notifyGatewayForPeerChanges(CommandUnicastUpdatePeers cup) {
-        Node node = noderepo.findById(IoTAgent.nodeid);
+        Node node = noderepo.findById(IoTAgent.nodeid).get(0);
         String gateway = node.getGateway();
         logger.info("Notifying gateway " + gateway + "  for insertions: " + cup.getAddlist().size() + " deletions " + cup.getDellist().size());
         if ((gateway != null) && (!gateway.equalsIgnoreCase(""))) {
@@ -54,6 +65,27 @@ public class AsyncExecutors {
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
         }
-    }//EoM    
+    }//EoM
+
+    @Async
+    public void getNodeStats(Node node) {
+        logger.info("getNodeStats for " + node.getId());
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://[" + node.getId() + "]:8080/api/v1/nodestats";
+        try {
+            //logger.info("Performing rest");
+            ParameterizedTypeReference<RestResponse<Nodestat>> typeref = new ParameterizedTypeReference<RestResponse<Nodestat>>() {
+            };
+            ResponseEntity<RestResponse<Nodestat>> resp = restTemplate.exchange(url, HttpMethod.GET, HttpEntity.EMPTY, typeref);
+            RestResponse<Nodestat> response = resp.getBody();
+            if (response.getRescode() == ResponseCode.SUCCESS) {
+                Nodestat nodestat = (Nodestat) (response.getResobject());
+                dbmanager.updateNodestat(nodestat);
+            }//if
+        } catch (Exception ex) {
+//            ex.printStackTrace();
+            logger.severe(ex.getMessage());
+        }
+    }//EoM
 
 }//EoC

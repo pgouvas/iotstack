@@ -8,9 +8,9 @@ import java.util.Objects;
  *
  * @author Panagiotis Gouvas
  */
-public class Node implements Serializable{
+public class Nodestat implements Serializable{
 
-    private String id;
+    private String nodeid;
     private String gateway;
     private String osarch;
     private String osname;    
@@ -18,22 +18,23 @@ public class Node implements Serializable{
     private int vcpus;
     private int cpuspeed;
     private int totalmemory;    
+    private Date checkdate;    
     
-    
-    public Node() {
+    public Nodestat() {
     }    
-    
-    public Node(String id) {
-        this.id = id;
+
+    public Nodestat(String nodeid) {
+        this.nodeid = nodeid;
     }
 
-    public String getId() {
-        return id;
+    public String getNodeid() {
+        return nodeid;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }    
+    public void setNodeid(String nodeid) {
+        this.nodeid = nodeid;
+    }
+    
     
     public Date getBootdate() {
         return bootdate;
@@ -90,6 +91,14 @@ public class Node implements Serializable{
     public void setTotalmemory(int totalmemory) {
         this.totalmemory = totalmemory;
     }    
+
+    public Date getCheckdate() {
+        return checkdate;
+    }
+
+    public void setCheckdate(Date checkdate) {
+        this.checkdate = checkdate;
+    }    
     
     @Override
     public int hashCode() {
@@ -108,8 +117,8 @@ public class Node implements Serializable{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Node other = (Node) obj;
-        if (!Objects.equals(this.id, other.id)) {
+        final Nodestat other = (Nodestat) obj;
+        if (!Objects.equals(this.nodeid, other.nodeid)) {
             return false;
         }
         return true;

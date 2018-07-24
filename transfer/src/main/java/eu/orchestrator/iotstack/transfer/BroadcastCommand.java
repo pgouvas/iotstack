@@ -1,5 +1,6 @@
 package eu.orchestrator.iotstack.transfer;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Random;
 
@@ -7,7 +8,7 @@ import java.util.Random;
  *
  * @author Panagiotis Gouvas
  */
-public class BroadcastCommand {
+public class BroadcastCommand implements Serializable{
  
     private String cid;     //command identifier
     private Date cdate;   //command date  

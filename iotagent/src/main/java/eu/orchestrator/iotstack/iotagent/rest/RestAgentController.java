@@ -6,6 +6,7 @@ import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
 import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Credentials;
 import eu.orchestrator.iotstack.transfer.InstanceModel;
+import eu.orchestrator.iotstack.transfer.Nodestat;
 import eu.orchestrator.iotstack.transfer.ResourceModel;
 import eu.orchestrator.iotstack.transfer.ResponseCode;
 import eu.orchestrator.iotstack.transfer.RestResponse;
@@ -42,11 +43,11 @@ public class RestAgentController {
         logger.info("Echo received");
         return "echo";
     }
-
+    
     @RequestMapping(value = "/peers", method = RequestMethod.POST)
     public String updatePeers(@RequestBody CommandUnicastUpdatePeers updatecommand) {
         logger.info("Rest updatePeers received");
-        dbmanager.updatePeers(updatecommand);  //effective only to gateway
+        dbmanager.updatePeersRemote(updatecommand);  //effective only to gateway
         logger.info("Rest updatePeers executed");
         return "ok";
     }//EoM
@@ -60,6 +61,18 @@ public class RestAgentController {
         return "ok";
     }//EoM    
 
+    @RequestMapping(value = "/nodestats", method = RequestMethod.GET)
+    public RestResponse getNodestats() {
+        RestResponse<Nodestat> response = new RestResponse();
+        logger.info("Rest getNodestats received");
+        Nodestat nodestat = dbmanager.getNodestats();
+        response.setRescode(ResponseCode.SUCCESS);
+        response.setResobject(nodestat);
+        logger.info("Rest getNodestats executed");
+        return response;
+    }//EoM        
+    
+    
     //-----SPI logic in order to be integrated in the MAESTRO Orchestrator-----
     
     @RequestMapping(value = "/validatecredentials", method = RequestMethod.POST)

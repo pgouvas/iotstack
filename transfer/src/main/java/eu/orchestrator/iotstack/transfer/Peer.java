@@ -1,5 +1,6 @@
 package eu.orchestrator.iotstack.transfer;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
@@ -7,7 +8,7 @@ import java.util.Objects;
  *
  * @author Panagiotis Gouvas
  */
-public class Peer {
+public class Peer implements Serializable{
     private String fromnode;
     private String tonode;
     private Date registrationdate;

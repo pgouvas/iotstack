@@ -29,6 +29,7 @@ public class PeerRepository {
             peer.setFromnode(rs.getString("fromnode"));
             peer.setTonode(rs.getString("tonode"));
             peer.setRegistrationdate(rs.getDate("registrationdate"));
+            peer.setReportingnode(rs.getString("reportingnode"));
             return peer;
         }//mapRaw         
     }//EoC 
@@ -37,9 +38,9 @@ public class PeerRepository {
         return jdbcTemplate.query("select * from peer", new PeerRowMapper());
     }//EoM
 
-    public Peer findById(String fromnode, String tonode) {
-        return jdbcTemplate.queryForObject("select * from peer where fromnode=? and tonode=?", new Object[]{fromnode, tonode},
-                new BeanPropertyRowMapper<Peer>(Peer.class));
+    public List<Peer> findById(String fromnode, String tonode) {
+        return jdbcTemplate.query("select * from peer where (fromnode=? and tonode=?) or (fromnode=? and tonode=?)", new Object[]{fromnode, tonode,tonode,fromnode},
+                new PeerRowMapper());
     }
 
     public int deleteById(String fromnode, String tonode) {
@@ -47,8 +48,8 @@ public class PeerRepository {
     }
 
     public int insert(Peer peer) {
-        return jdbcTemplate.update("insert into peer (fromnode,tonode,registrationdate) " + "values(?,?,?)",
-                new Object[]{peer.getFromnode(), peer.getTonode(), peer.getRegistrationdate()});
+        return jdbcTemplate.update("insert into peer (fromnode,tonode,registrationdate,reportingnode) " + "values(?,?,?,?)",
+                new Object[]{peer.getFromnode(), peer.getTonode(), peer.getRegistrationdate(), peer.getReportingnode()});
     }
 
     class PeerNodeRowMapper implements RowMapper<Node> {
@@ -65,4 +66,8 @@ public class PeerRepository {
         return jdbcTemplate.query("select distinct tonode from peer where fromnode = ?", new Object[]{fromnode}, new PeerNodeRowMapper());
     }
 
+    public List<Node> getAllPublishedNodes() {
+        return jdbcTemplate.query("select distinct * from (select tonode from peer union select fromnode from peer) ", new PeerNodeRowMapper());
+    }    
+    
 }//EoC

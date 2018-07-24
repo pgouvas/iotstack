@@ -42,9 +42,8 @@ public class NodeRepository {
         return jdbcTemplate.query("select * from node", new NodeRowMapper());
     }//EoM
     
-    public Node findById(String id) {
-        return jdbcTemplate.queryForObject("select * from node where id=?", new Object[]{id},
-                new BeanPropertyRowMapper<Node>(Node.class));
+    public List<Node> findById(String id) {
+        return jdbcTemplate.query("select * from node where id=?", new Object[]{id},new NodeRowMapper());
     }//EoM
 
     public int deleteById(String id) {

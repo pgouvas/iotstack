@@ -53,7 +53,7 @@ public class PeerUpdateScheduler {
         }//for         
         if (addlist.size() > 0 || dellist.size() > 0) {
             //update database
-            dbmanager.updatePeers(addlist, dellist);
+            dbmanager.updatePeersLocal(addlist, dellist);
             //notify gateway
             CommandUnicastUpdatePeers cup = new CommandUnicastUpdatePeers(addlist, dellist);
             async.notifyGatewayForPeerChanges(cup);

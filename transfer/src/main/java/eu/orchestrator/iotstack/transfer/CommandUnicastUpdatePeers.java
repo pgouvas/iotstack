@@ -1,12 +1,13 @@
 package eu.orchestrator.iotstack.transfer;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author Panagiotis Gouvas
  */
-public class CommandUnicastUpdatePeers {
+public class CommandUnicastUpdatePeers implements Serializable{
 
     private List<Peer> addlist;
     private List<Peer> dellist;

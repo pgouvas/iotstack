@@ -6,9 +6,11 @@ import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
 import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Credentials;
 import eu.orchestrator.iotstack.transfer.Node;
+import eu.orchestrator.iotstack.transfer.Nodestat;
 import eu.orchestrator.iotstack.transfer.Peer;
 import eu.orchestrator.iotstack.transfer.ResponseCode;
 import eu.orchestrator.iotstack.transfer.RestResponse;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +33,12 @@ public class DBManager {
     @Autowired
     PeerRepository peerrepo;
     @Autowired
+    NodestatRepository nodestatrepo;
+    @Autowired
     AsyncExecutors async;
 
     @Transactional
-    public void updatePeers(List<Peer> addlist, List<Peer> dellist) {
+    public void updatePeersLocal(List<Peer> addlist, List<Peer> dellist) {
         logger.info("DBManager.updatePeers additions: " + addlist.size() + " deletions: " + dellist.size());
         for (Peer peer : dellist) {
             peerrepo.deleteById(peer.getFromnode(), peer.getTonode());
@@ -54,13 +58,14 @@ public class DBManager {
 
     //--------------------Commands Handling    
     @Transactional
-    public void updatePeers(CommandUnicastUpdatePeers updatecommand) {
+    public void updatePeersRemote(CommandUnicastUpdatePeers updatecommand) {
         List<Peer> addlist = updatecommand.getAddlist();
         List<Peer> dellist = updatecommand.getDellist();
         logger.info("DBManager.updatePeers additions: " + addlist.size() + " deletions: " + dellist.size());
         for (Peer peer : dellist) {
             peerrepo.deleteById(peer.getFromnode(), peer.getTonode());
         }
+
         //Prevent douples
         List<Peer> existinglist = peerrepo.findAll();
         for (Peer addpeer : addlist) {
@@ -76,10 +81,10 @@ public class DBManager {
 
     @Transactional
     public void updateGateway(CommandBroadcastUpdateGateway cbug) {
-        logger.info("DBManager.updateGateway "+cbug.getCid());
-        if (clogrepo.findById(cbug.getCid()).size()==0) {
+        logger.info("DBManager.updateGateway " + cbug.getCid());
+        if (clogrepo.findById(cbug.getCid()).size() == 0) {
             //TODO itnegrate commandlog repo
-            Node node = noderepo.findById(IoTAgent.nodeid);
+            Node node = noderepo.findById(IoTAgent.nodeid).get(0);
             node.setGateway(cbug.getGatewayid());
             noderepo.update(node);
             //forwarding logic
@@ -95,21 +100,47 @@ public class DBManager {
             clogrepo.insert(new Commandlog(cbug.getCid(), cbug.getCdate()));
         } else {
             //ignoring command
-            logger.info("DBManager.updateGateway "+cbug.getCid()+ " ignored!");
+            logger.info("DBManager.updateGateway " + cbug.getCid() + " ignored!");
         }
     }//EoM
-    
+
     @Transactional
-    public RestResponse validatecredentials(Credentials credentials){
+    public RestResponse validatecredentials(Credentials credentials) {
         RestResponse result = new RestResponse();
-        if (credentials.getUsername().equalsIgnoreCase("admin") && credentials.getPassword().equalsIgnoreCase("!admin!")){
+        if (credentials.getUsername().equalsIgnoreCase("admin") && credentials.getPassword().equalsIgnoreCase("!admin!")) {
             result.setRescode(ResponseCode.SUCCESS);
-            result.setMessage("success");            
-        } else {            
+            result.setMessage("success");
+        } else {
             result.setRescode(ResponseCode.INVALID);
             result.setMessage("Authorization failure");
         }
         return result;
     }//EoM
     
+    @Transactional
+    public Nodestat getNodestats() {
+        Node node = noderepo.findById(IoTAgent.nodeid).get(0);
+        Nodestat nodestat = new Nodestat();
+        nodestat.setNodeid(node.getId());
+        nodestat.setBootdate(node.getBootdate());
+        nodestat.setCheckdate(new Date());
+        nodestat.setCpuspeed(node.getCpuspeed());
+        nodestat.setGateway(node.getGateway());
+        nodestat.setOsarch(node.getOsarch());
+        nodestat.setOsname(node.getOsname());
+        nodestat.setTotalmemory(node.getTotalmemory());
+        nodestat.setVcpus(node.getVcpus());
+        return nodestat;
+    }//EoM
+
+    @Transactional    
+    public void updateNodestat(Nodestat nodestat) {
+        logger.info("DBManager updating nodestats for "+nodestat.getNodeid());
+        if (nodestatrepo.findById(nodestat.getNodeid()).isEmpty()){
+            nodestatrepo.insert(nodestat);
+        } else {
+            nodestatrepo.update(nodestat);
+        }
+    }//EoM
+
 }//EoC

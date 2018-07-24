@@ -1,10 +1,12 @@
 package eu.orchestrator.iotstack.transfer;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Panagiotis Gouvas
  */
-public class Credentials {
+public class Credentials implements Serializable{
    private String username;
    private String password;
 

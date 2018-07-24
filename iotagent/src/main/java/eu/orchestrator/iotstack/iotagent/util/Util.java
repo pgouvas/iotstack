@@ -31,36 +31,40 @@ public class Util {
     //  nproc --all
     //  lscpu | grep "max MHz" | awk  '{print $4}' | cut -d'.' -f1   
     //free -m | grep "Mem" | awk  '{print $2}'
-    public static String GetCommandStatus(int command) {
-        String cmd = "";
-
+    public static String[] GetCommandStatus(int command) {
+        String cmdappend = "";
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };
         switch (command) {
             case COMMAND_GET_STATUS:
-                cmd = "status";
+                cmdappend = "status";
                 if (IoTAgent.osname.equalsIgnoreCase("Linux") && IoTAgent.osarch.equalsIgnoreCase("amd64")) {
-                    cmd = "cat status";
+                    cmdappend = "cat status";
                 }
                 break;
             case COMMAND_GET_VCPUS:
-                cmd = "nproc --all";
+                cmdappend = "nproc --all";
                 break;
 
             case COMMAND_GET_CPUSPEED:
-                cmd = "lscpu | grep 'max MHz' | awk  '{print $4}' | cut -d'.' -f1 ";
+                cmdappend = "lscpu | grep 'max MHz' | awk  '{print $4}' | cut -d'.' -f1 ";
                 break;
 
             case COMMAND_GET_MEMORYSIZE:
-                cmd = "free -m | grep 'Mem' | awk  '{print $2}' ";
+                cmdappend = "free -m | grep 'Mem' | awk  '{print $2}' ";
                 break;
 
             default:
                 break;
         }//switch
-
+        cmd[2] = cmdappend;
         return cmd;
     }
 
-    public static String executeCommandSingleLineOutput(String command) {
+    public static String executeCommandSingleLineOutput(String[] command) {
         StringBuffer output = new StringBuffer();
         Process p;
         try {
@@ -74,7 +78,7 @@ public class Util {
         return output.toString();
     }//EoM        
 
-    public static String executeCommandMultiLineOutput(String command) {
+    public static String executeCommandMultiLineOutput(String[] command) {
         StringBuffer output = new StringBuffer();
         Process p;
         try {
@@ -94,7 +98,7 @@ public class Util {
     public static int getVCPUs() {
         int ret = 0;
         String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_VCPUS));
-        logger.info("|" + output + "|");
+//        logger.info("|" + output + "|");
         ret = Integer.parseInt(output.trim());
         return ret;
     }//EoM
@@ -102,7 +106,7 @@ public class Util {
     public static int getCPUSpeed() {
         int ret = 0;
         String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_CPUSPEED));
-        logger.info("|" + output + "|");
+//        logger.info("|" + output + "|");
         ret = Integer.parseInt(output.trim());
         return ret;
     }//EoM    
@@ -110,7 +114,7 @@ public class Util {
     public static int getMemorysize() {
         int ret = 0;
         String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_MEMORYSIZE));
-        logger.info("|" + output + "|");
+//        logger.info("|" + output + "|");
         ret = Integer.parseInt(output.trim());
         return ret;
     }//EoM

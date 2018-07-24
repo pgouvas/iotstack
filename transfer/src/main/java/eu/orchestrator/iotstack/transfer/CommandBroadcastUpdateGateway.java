@@ -4,7 +4,7 @@ package eu.orchestrator.iotstack.transfer;
  *
  * @author Panagiotis Gouvas
  */
-public class CommandBroadcastUpdateGateway extends BroadcastCommand{
+public class CommandBroadcastUpdateGateway extends BroadcastCommand {
  
     private String gatewayid;
 
