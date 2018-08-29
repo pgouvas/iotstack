@@ -39,6 +39,7 @@ CREATE TABLE peer
    fromnode varchar(40) not null,
    tonode varchar(40) not null,
    registrationdate timestamp,
+   isactive boolean, 
    reportingnode varchar(40)
 );
 

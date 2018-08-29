@@ -85,8 +85,8 @@ public class RestAgentController {
         return response;
     }//EoM      
 
-    @RequestMapping(value = "/instances", method = RequestMethod.GET)
-    public RestResponse getinstances(@RequestBody Credentials credentials) {
+    @RequestMapping(value = "/instances", method = RequestMethod.POST)
+    public RestResponse getinstancesproxy(@RequestBody Credentials credentials) {
         RestResponse response = new RestResponse();
         logger.info("Rest getinstances received");
         List<InstanceModel> instances = new ArrayList<>();
@@ -97,7 +97,7 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/instance", method = RequestMethod.POST)
-    public RestResponse bootInstance(@RequestBody Credentials credentials,@RequestBody InstanceModel instance) {
+    public RestResponse bootInstanceproxy(@RequestBody Credentials credentials,@RequestBody InstanceModel instance) {
         RestResponse response = new RestResponse();
         logger.info("Rest bootInstance received");
         response.setRescode(ResponseCode.SUCCESS);
@@ -106,7 +106,7 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/instance/{instanceid}", method = RequestMethod.DELETE)
-    public RestResponse removeInstance(@RequestBody Credentials credentials,@PathVariable String instanceid) {
+    public RestResponse removeInstanceproxy(@RequestBody Credentials credentials,@PathVariable String instanceid) {
         RestResponse response = new RestResponse();
         logger.info("Rest removeInstance received");
         response.setRescode(ResponseCode.SUCCESS);
@@ -114,7 +114,7 @@ public class RestAgentController {
         return response;
     }//EoM      
 
-    @RequestMapping(value = "/resources", method = RequestMethod.GET)
+    @RequestMapping(value = "/resources", method = RequestMethod.POST)
     public RestResponse getResources(@RequestBody Credentials credentials) {    
         RestResponse response = new RestResponse();
         logger.info("Rest getResources received");
@@ -125,7 +125,7 @@ public class RestAgentController {
         return response;
     }//EoM      
 
-    @RequestMapping(value = "/topology", method = RequestMethod.GET)
+    @RequestMapping(value = "/topology", method = RequestMethod.POST)
     public RestResponse getTopology(@RequestBody Credentials credentials) {                                 //
         RestResponse response = new RestResponse();
         logger.info("Rest getTopology received");

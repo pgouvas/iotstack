@@ -41,7 +41,8 @@ public class GatewaySolicitationScheduler {
             CommandBroadcastUpdateGateway cug = new CommandBroadcastUpdateGateway(IoTAgent.nodeid,IoTAgent.nodeid,IoTAgent.nodeid);
             clrepo.insert(new Commandlog(cug.getCid(), new Date()));
             logger.info("Broadcast "+cug.getCid()+" created and ready to be sent");
-            List<Node> adjacentnodes = peerrepo.getAdjacentNodes(IoTAgent.nodeid);
+            //TODO The logic may go to sych executors
+            List<Node> adjacentnodes = peerrepo.getAdjacentActiveNodes(IoTAgent.nodeid);
             for (Node adjacentnode : adjacentnodes) {
                 async.notifyAdjacentNodesForGateway(cug,adjacentnode.getId());                
             }//for

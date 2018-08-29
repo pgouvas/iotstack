@@ -9,7 +9,6 @@ import eu.orchestrator.iotstack.transfer.Node;
 import eu.orchestrator.iotstack.transfer.Nodestat;
 import eu.orchestrator.iotstack.transfer.ResponseCode;
 import eu.orchestrator.iotstack.transfer.RestResponse;
-import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -83,9 +82,9 @@ public class AsyncExecutors {
                 dbmanager.updateNodestat(nodestat);
             }//if
         } catch (Exception ex) {
-//            ex.printStackTrace();
-            logger.severe(ex.getMessage());
+            logger.severe("Communication Exception. Node not reachable or Agent not running for "+node.getId());
         }
     }//EoM
-
+    
+    
 }//EoC

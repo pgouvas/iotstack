@@ -90,7 +90,7 @@ public class DBManager {
             node.setGateway(cbug.getGatewayid());
             noderepo.update(node);
             //forwarding logic
-            List<Node> adjacentnodes = peerrepo.getAdjacentNodes(IoTAgent.nodeid);
+            List<Node> adjacentnodes = peerrepo.getAdjacentActiveNodes(IoTAgent.nodeid);
             //avoid loops by removing solicitor and gateway
             adjacentnodes.remove(new Node(cbug.getGatewayid()));
             adjacentnodes.remove(new Node(cbug.getSolicitorid()));

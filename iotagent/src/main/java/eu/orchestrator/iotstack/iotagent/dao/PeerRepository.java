@@ -30,6 +30,7 @@ public class PeerRepository {
             peer.setTonode(rs.getString("tonode"));
             peer.setRegistrationdate(rs.getDate("registrationdate"));
             peer.setReportingnode(rs.getString("reportingnode"));
+            peer.setIsactive(rs.getBoolean("isactive"));
             return peer;
         }//mapRaw         
     }//EoC 
@@ -39,7 +40,7 @@ public class PeerRepository {
     }//EoM
 
     public List<Peer> findById(String fromnode, String tonode) {
-        return jdbcTemplate.query("select * from peer where (fromnode=? and tonode=?) or (fromnode=? and tonode=?)", new Object[]{fromnode, tonode,tonode,fromnode},
+        return jdbcTemplate.query("select * from peer where (fromnode=? and tonode=?) or (fromnode=? and tonode=?)", new Object[]{fromnode, tonode, tonode, fromnode},
                 new PeerRowMapper());
     }
 
@@ -48,8 +49,8 @@ public class PeerRepository {
     }
 
     public int insert(Peer peer) {
-        return jdbcTemplate.update("insert into peer (fromnode,tonode,registrationdate,reportingnode) " + "values(?,?,?,?)",
-                new Object[]{peer.getFromnode(), peer.getTonode(), peer.getRegistrationdate(), peer.getReportingnode()});
+        return jdbcTemplate.update("insert into peer (fromnode,tonode,registrationdate,reportingnode,isactive) " + "values(?,?,?,?,?)",
+                new Object[]{peer.getFromnode(), peer.getTonode(), peer.getRegistrationdate(), peer.getReportingnode(), peer.isIsactive()});
     }
 
     class PeerNodeRowMapper implements RowMapper<Node> {
@@ -62,12 +63,18 @@ public class PeerRepository {
         }//mapRaw         
     }//EoC     
 
-    public List<Node> getAdjacentNodes(String fromnode) {
-        return jdbcTemplate.query("select distinct tonode from peer where fromnode = ?", new Object[]{fromnode}, new PeerNodeRowMapper());
+//    public List<Node> getAdjacentNodes(String fromnode) {
+//        return jdbcTemplate.query("select distinct tonode from peer where fromnode = ?", new Object[]{fromnode}, new PeerNodeRowMapper());
+//    }
+    public List<Node> getAdjacentActiveNodes(String fromnode) {
+        return jdbcTemplate.query("select distinct tonode from peer where fromnode = ? and isactive=true", new Object[]{fromnode}, new PeerNodeRowMapper());
     }
 
-    public List<Node> getAllPublishedNodes() {
-        return jdbcTemplate.query("select distinct * from (select tonode from peer union select fromnode from peer) ", new PeerNodeRowMapper());
-    }    
-    
+//    public List<Node> getAllPublishedNodes() {
+//        return jdbcTemplate.query("select distinct * from (select tonode from peer union select fromnode from peer) ", new PeerNodeRowMapper());
+//    }    
+    public List<Node> getAllAnnouncedNodes() {
+        return jdbcTemplate.query("select distinct * from (select tonode from peer where isactive=true union select fromnode from peer where isactive=true) ", new PeerNodeRowMapper());
+    }
+
 }//EoC

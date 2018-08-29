@@ -176,4 +176,23 @@ public class Util {
         return response;
     }//EoM
 
+    public static boolean invokeRestGetNodeId(String ipv6) {
+        boolean ret = false;
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://[" + ipv6 + "]:8080/api/v1/nodeid";
+        String response = "";
+        logger.info("Invoking service getNodeId at " + ipv6);
+        try {
+            response = restTemplate.getForObject(url, String.class);
+            //logger.info("Response at " + ipv6);
+            if (response.equalsIgnoreCase(response)) ret = true;
+            logger.info("Service "+ipv6+" active");
+        } catch (Exception ex) {
+            logger.severe(url + " is unreachable");
+            ret = false;
+        }
+        return ret;
+    }//EoM    
+    
+    
 }//EoC

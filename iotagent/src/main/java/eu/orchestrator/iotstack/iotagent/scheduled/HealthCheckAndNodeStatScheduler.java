@@ -31,7 +31,7 @@ public class HealthCheckAndNodeStatScheduler {
     public void getNodeStats() {
         if (IoTAgent.isGateway()) {
             logger.info("getNodeStats: " + dateFormat.format(new Date()));
-            List<Node> allnodes = peerrepo.getAllPublishedNodes();
+            List<Node> allnodes = peerrepo.getAllAnnouncedNodes();
             for (Node node : allnodes) {
                 async.getNodeStats(node);
             }//for

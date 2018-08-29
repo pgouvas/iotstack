@@ -3,6 +3,7 @@ package eu.orchestrator.iotstack.iotagent.scheduled;
 import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
+import eu.orchestrator.iotstack.iotagent.synch.SynchExecutors;
 import eu.orchestrator.iotstack.iotagent.util.Util;
 import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Peer;
@@ -32,7 +33,10 @@ public class PeerUpdateScheduler {
     DBManager dbmanager;
     @Autowired
     AsyncExecutors async;
-
+    @Autowired
+    SynchExecutors synch;
+    
+    
     @Scheduled(fixedRate = 3000)
     public void scanNeighborhoodAndReactOnChanges() {
         logger.info("scanNeighborhoodAndReactOnChanges: " + dateFormat.format(new Date()));
@@ -52,6 +56,9 @@ public class PeerUpdateScheduler {
             }
         }//for         
         if (addlist.size() > 0 || dellist.size() > 0) {
+            //check which of the nodes are active (i.e. agent is running)
+            addlist = synch.getNodeConfigurationState(addlist);
+            logger.info("activelist: "+addlist);
             //update database
             dbmanager.updatePeersLocal(addlist, dellist);
             //notify gateway
