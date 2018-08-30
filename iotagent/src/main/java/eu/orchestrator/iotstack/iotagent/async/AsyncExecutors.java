@@ -82,9 +82,19 @@ public class AsyncExecutors {
                 dbmanager.updateNodestat(nodestat);
             }//if
         } catch (Exception ex) {
-            logger.severe("Communication Exception. Node not reachable or Agent not running for "+node.getId());
+            logger.severe("Communication Exception. Node not reachable or Agent not running for " + node.getId());
         }
     }//EoM
-    
-    
+
+    @Async
+    public void getNodeIperfStats(Node node) {
+        logger.info("getNodeIperfStats for " + node.getId());
+        RestTemplate restTemplate = new RestTemplate();
+        //target node.getId() 
+        try {
+
+        } catch (Exception ex) {
+        }
+    }//EoM    
+
 }//EoC

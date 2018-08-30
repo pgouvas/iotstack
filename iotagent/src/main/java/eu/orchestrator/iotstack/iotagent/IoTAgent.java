@@ -7,6 +7,7 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -70,9 +71,17 @@ public class IoTAgent {
         node.setTotalmemory(totalmemory);
         //persist to database
         noderepo.insert(node);
+        //initialize ip3rf3 Daemon
+        Util.killPerf3D();
+        Util.initiateIPerf3D();
         logger.info("Initialization finished for " + nodeid + " VCPUs: " + vcpus + " cpuspeed: " + cpuspeed + " totalmemory: " + totalmemory);
     }//EoM
 
+    @PreDestroy
+    private void ondestroy(){
+        //TODO implement destruction of iperf3daemon
+    }
+    
     @Bean
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

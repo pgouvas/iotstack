@@ -26,6 +26,8 @@ public class Util {
     private static final int COMMAND_GET_CPUSPEED = 2;
     private static final int COMMAND_GET_MEMORYSIZE = 3;
     private static final int COMMAND_GET_DISKSIZE = 4;
+    private static final int INITIATE_IPERF3 = 5;
+    private static final int KILL_IPERF3 = 6;
 
     //  lscpu | grep -E '^Thread|^Core|^Socket|^CPU\('
     //  nproc --all
@@ -55,6 +57,15 @@ public class Util {
 
             case COMMAND_GET_MEMORYSIZE:
                 cmdappend = "free -m | grep 'Mem' | awk  '{print $2}' ";
+                break;
+
+            //5201 port    
+            case INITIATE_IPERF3:
+                cmdappend = "iperf3 -s -D";
+                break;
+                
+            case KILL_IPERF3:
+                cmdappend = "ps -ef | grep iperf3 | awk '{print $2}' | xargs kill -9";
                 break;
 
             default:
@@ -94,6 +105,18 @@ public class Util {
         }
         return output.toString();
     }//EoM    
+
+    public static String initiateIPerf3D() {
+        String output = executeCommandSingleLineOutput(GetCommandStatus(INITIATE_IPERF3));
+//        logger.info("|" + output + "|");
+        return output;
+    }
+    
+    public static String killPerf3D() {
+        String output = executeCommandSingleLineOutput(GetCommandStatus(KILL_IPERF3));
+//        logger.info("|" + output + "|");
+        return output;
+    }
 
     public static int getVCPUs() {
         int ret = 0;
@@ -185,14 +208,15 @@ public class Util {
         try {
             response = restTemplate.getForObject(url, String.class);
             //logger.info("Response at " + ipv6);
-            if (response.equalsIgnoreCase(response)) ret = true;
-            logger.info("Service "+ipv6+" active");
+            if (response.equalsIgnoreCase(response)) {
+                ret = true;
+            }
+            logger.info("Service " + ipv6 + " active");
         } catch (Exception ex) {
             logger.severe(url + " is unreachable");
             ret = false;
         }
         return ret;
     }//EoM    
-    
-    
+
 }//EoC
