@@ -146,8 +146,32 @@ public class DBManager {
     }//EoM
 
     @Transactional
+    public void updateNodestatForBandwith(String nodeid, String bandwidth) {
+        logger.info("DBManager updating nodestats for bandwidth" + nodeid);
+        Nodestat nodestat = nodestatrepo.findById(nodeid).get(0);
+        nodestat.setBandwith(bandwidth);
+        nodestatrepo.update(nodestat);
+    }//EoM    
+    
+    @Transactional
+    public void updateNodestatForRTTDelay(String nodeid, String rttdelay) {
+        logger.info("DBManager updating nodestats for rttdelay" + nodeid);
+        Nodestat nodestat = nodestatrepo.findById(nodeid).get(0);
+        nodestat.setRttdelay(rttdelay);
+        nodestatrepo.update(nodestat);
+    }//EoM
+    
+    @Transactional
+    public void updateNodestatForPacketLoss(String nodeid, String packetloss) {
+        logger.info("DBManager updating nodestats for packetloss" + nodeid);
+        Nodestat nodestat = nodestatrepo.findById(nodeid).get(0);
+        nodestat.setPacketloss(packetloss);
+        nodestatrepo.update(nodestat);
+    }//EoM    
+
+    @Transactional
     public ResourceModel getResources() {
-        logger.info("getResources vcpus: " + nodestatrepo.getMaxVCPUs() +" ram: "+nodestatrepo.getMaxRam());
+        logger.info("getResources vcpus: " + nodestatrepo.getMaxVCPUs() + " ram: " + nodestatrepo.getMaxRam());
         ResourceModel resourcemodel = new ResourceModel();
         resourcemodel.setId(IoTAgent.nodeid);
         resourcemodel.setMaxRam(nodestatrepo.getMaxRam());
@@ -162,10 +186,10 @@ public class DBManager {
         return resourcemodel;
     }//EoM
 
-    @Transactional    
+    @Transactional
     public Topology getTopology() {
         Topology topology = new Topology();
-        topology.setPeers( peerrepo.findAll() );
+        topology.setPeers(peerrepo.findAll());
         return topology;
     }//EoM
 

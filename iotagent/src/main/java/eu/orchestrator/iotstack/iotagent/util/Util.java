@@ -73,8 +73,10 @@ public class Util {
         }//switch
         cmd[2] = cmdappend;
         return cmd;
-    }
+    }//GetCommandStatus
 
+
+    
     public static String executeCommandSingleLineOutput(String[] command) {
         StringBuffer output = new StringBuffer();
         Process p;
@@ -112,12 +114,50 @@ public class Util {
         return output;
     }
     
+    //TODO fix restart
     public static String killPerf3D() {
         String output = executeCommandSingleLineOutput(GetCommandStatus(KILL_IPERF3));
 //        logger.info("|" + output + "|");
         return output;
     }
+    
+    public static String measureBandwith(String nodeid){
+        String cmdappend = "iperf3 -c "+nodeid+" -t 5  -i 0 -f m  -P 2   | grep SUM | grep sender | awk '{print $6}'";
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };  
+        cmd[2] = cmdappend;                
+        String output = executeCommandMultiLineOutput(cmd); 
+        return output.trim();
+    }//measureBandwith    
 
+    public static String measureRTTDelay(String nodeid){
+        String cmdappend = "ping6 "+nodeid+" -c 5 | grep rtt | cut -d/ -f5";
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };  
+        cmd[2] = cmdappend;                
+        String output = executeCommandMultiLineOutput(cmd); 
+        return output.trim();
+    }//measureRTTDelay
+    
+    public static String measurePacketLoss(String nodeid){
+        String cmdappend = "ping6 "+nodeid+" -c 5 | grep loss | cut -d, -f3 | cut -d% -f1";
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };  
+        cmd[2] = cmdappend;                
+        String output = executeCommandMultiLineOutput(cmd); 
+        return output.trim();
+    }//measurePacketLoss    
+    
+    
     public static int getVCPUs() {
         int ret = 0;
         String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_VCPUS));

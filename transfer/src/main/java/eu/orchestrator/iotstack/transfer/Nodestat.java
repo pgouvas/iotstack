@@ -8,20 +8,23 @@ import java.util.Objects;
  *
  * @author Panagiotis Gouvas
  */
-public class Nodestat implements Serializable{
+public class Nodestat implements Serializable {
 
     private String nodeid;
     private String gateway;
     private String osarch;
-    private String osname;    
+    private String osname;
     private Date bootdate;
     private int vcpus;
     private int cpuspeed;
-    private int totalmemory;    
-    private Date checkdate;    
-    
+    private int totalmemory;
+    private Date checkdate;
+    private String bandwith;
+    private String rttdelay;
+    private String packetloss;
+
     public Nodestat() {
-    }    
+    }
 
     public Nodestat(String nodeid) {
         this.nodeid = nodeid;
@@ -34,8 +37,7 @@ public class Nodestat implements Serializable{
     public void setNodeid(String nodeid) {
         this.nodeid = nodeid;
     }
-    
-    
+
     public Date getBootdate() {
         return bootdate;
     }
@@ -90,7 +92,7 @@ public class Nodestat implements Serializable{
 
     public void setTotalmemory(int totalmemory) {
         this.totalmemory = totalmemory;
-    }    
+    }
 
     public Date getCheckdate() {
         return checkdate;
@@ -98,6 +100,30 @@ public class Nodestat implements Serializable{
 
     public void setCheckdate(Date checkdate) {
         this.checkdate = checkdate;
+    }
+
+    public String getBandwith() {
+        return bandwith;
+    }
+
+    public void setBandwith(String bandwith) {
+        this.bandwith = bandwith;
+    }
+
+    public String getRttdelay() {
+        return rttdelay;
+    }
+
+    public void setRttdelay(String rttdelay) {
+        this.rttdelay = rttdelay;
+    }
+
+    public String getPacketloss() {
+        return packetloss;
+    }
+
+    public void setPacketloss(String packetloss) {
+        this.packetloss = packetloss;
     }    
     
     @Override
@@ -122,6 +148,6 @@ public class Nodestat implements Serializable{
             return false;
         }
         return true;
-    }         
-    
+    }
+
 }

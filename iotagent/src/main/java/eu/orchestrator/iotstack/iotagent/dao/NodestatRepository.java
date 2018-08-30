@@ -33,6 +33,10 @@ public class NodestatRepository {
             nodestat.setCpuspeed(rs.getInt("cpuspeed"));
             nodestat.setTotalmemory(rs.getInt("totalmemory"));
             nodestat.setCheckdate(rs.getDate("bootdate"));
+            nodestat.setBandwith(rs.getString("bandwidth"));
+            nodestat.setRttdelay(rs.getString("rttdelay"));
+            nodestat.setPacketloss(rs.getString("packetloss")); 
+            
             return nodestat;
         }//mapRaw         
     }//EoC 
@@ -50,13 +54,13 @@ public class NodestatRepository {
     }//EoM
 
     public int insert(Nodestat nodestat) {
-        return jdbcTemplate.update("insert into nodestat (nodeid,gateway,osarch,osname,bootdate,vcpus,cpuspeed,totalmemory, checkdate) " + "values(?,?,?,?,?,?,?,?,?)",
-                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getVcpus(), nodestat.getCpuspeed(), nodestat.getTotalmemory(), nodestat.getCheckdate()});
+        return jdbcTemplate.update("insert into nodestat (nodeid,gateway,osarch,osname,bootdate,vcpus,cpuspeed,totalmemory, checkdate,bandwidth,rttdelay,packetloss) " + "values(?,?,?,?,?,?,?,?,?,?,?,?)",
+                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getVcpus(), nodestat.getCpuspeed(), nodestat.getTotalmemory(), nodestat.getCheckdate() , nodestat.getBandwith(), nodestat.getRttdelay(), nodestat.getPacketloss() });
     }//EoM
 
     public int update(Nodestat nodestat) {
-        return jdbcTemplate.update("update nodestat " + " set nodeid = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ?, checkdate = ? where nodeid = ?",
-                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getCheckdate(), nodestat.getNodeid()});
+        return jdbcTemplate.update("update nodestat " + " set nodeid = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ?, checkdate = ? , bandwidth = ? , rttdelay = ? , packetloss = ?   where nodeid = ?",
+                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getCheckdate(), nodestat.getBandwith(), nodestat.getRttdelay(), nodestat.getPacketloss(), nodestat.getNodeid()});
     }//EoM
 
     class IntRowMapper implements RowMapper<Integer> {

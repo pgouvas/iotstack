@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS node;
 DROP TABLE IF EXISTS nodestat;
 DROP TABLE IF EXISTS peer;
-DROP TABLE IF EXISTS peerreport;
 DROP TABLE IF EXISTS commandlog;
 
 CREATE TABLE node
@@ -30,6 +29,9 @@ CREATE TABLE nodestat
    cpuspeed integer,
    totalmemory integer,
    checkdate timestamp,
+   bandwidth varchar(40),
+   rttdelay varchar(40),
+   packetloss varchar(40),
    primary key(nodeid)
 );
 
@@ -39,15 +41,10 @@ CREATE TABLE peer
    fromnode varchar(40) not null,
    tonode varchar(40) not null,
    registrationdate timestamp,
-   isactive boolean, 
+   isactive boolean default false, 
    reportingnode varchar(40)
 );
 
-CREATE TABLE peerreport
-(
-    peerid bigint not null,
-    nodeid varchar(40) not null
-);
 
 CREATE TABLE commandlog
 (

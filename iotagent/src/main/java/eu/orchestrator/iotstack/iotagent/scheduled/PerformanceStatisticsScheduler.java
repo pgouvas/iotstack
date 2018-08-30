@@ -17,9 +17,9 @@ import org.springframework.stereotype.Component;
  * @author Panagiotis Gouvas
  */
 @Component
-public class GatewayIPerfStatisticsScheduler {
+public class PerformanceStatisticsScheduler {
 
-    private static final Logger logger = Logger.getLogger(GatewayIPerfStatisticsScheduler.class.getName());
+    private static final Logger logger = Logger.getLogger(PerformanceStatisticsScheduler.class.getName());
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     @Autowired
@@ -28,12 +28,14 @@ public class GatewayIPerfStatisticsScheduler {
     AsyncExecutors async;
 
     @Scheduled(fixedRate = 60000)
-    public void getNodeIperfStats() {
+    public void getNodePerformanceStats() {
         if (IoTAgent.isGateway()) {
-            logger.info("getNodeIperfStats: " + dateFormat.format(new Date()));
+            logger.info("getNodePerformanceStats: " + dateFormat.format(new Date()));
             List<Node> allnodes = peerrepo.getAllActiveAnnouncedNodes();            
             for (Node node : allnodes) {
-                async.getNodeStats(node);
+                async.measureBandwidth(node);
+                async.measureRTTDelay(node);
+                async.measurePacketloss(node);
             }//for
             
         }//if

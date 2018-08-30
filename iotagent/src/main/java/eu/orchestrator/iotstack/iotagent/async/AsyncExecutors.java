@@ -3,6 +3,7 @@ package eu.orchestrator.iotstack.iotagent.async;
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
+import eu.orchestrator.iotstack.iotagent.util.Util;
 import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
 import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
 import eu.orchestrator.iotstack.transfer.Node;
@@ -87,14 +88,36 @@ public class AsyncExecutors {
     }//EoM
 
     @Async
-    public void getNodeIperfStats(Node node) {
-        logger.info("getNodeIperfStats for " + node.getId());
-        RestTemplate restTemplate = new RestTemplate();
-        //target node.getId() 
+    public void measureBandwidth(Node node) {
+        logger.info("MeasureBandwidth for " + node.getId());
         try {
-
+            String output = Util.measureBandwith(node.getId());
+            dbmanager.updateNodestatForBandwith(node.getId(), output);
+            logger.info("Bandwith for "+node.getId()+" : "+output);
         } catch (Exception ex) {
         }
-    }//EoM    
+    }//EoM        
+
+    @Async
+    public void measureRTTDelay(Node node) {
+        logger.info("MeasureRTTDelay for " + node.getId());
+        try {
+            String output = Util.measureRTTDelay(node.getId());
+            dbmanager.updateNodestatForRTTDelay(node.getId(), output);            
+            logger.info("RTTDelay for "+node.getId()+" : "+output);
+        } catch (Exception ex) {
+        }
+    }//EoM  
+
+    @Async
+    public void measurePacketloss(Node node) {
+        logger.info("MeasurePacketloss for " + node.getId());
+        try {
+            String output = Util.measurePacketLoss(node.getId());
+            dbmanager.updateNodestatForPacketLoss(node.getId(), output);                        
+            logger.info("Packetloss for "+node.getId()+" : "+output);
+        } catch (Exception ex) {
+        }
+    }//EoM           
 
 }//EoC

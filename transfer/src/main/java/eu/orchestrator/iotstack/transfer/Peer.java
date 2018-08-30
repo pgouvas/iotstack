@@ -14,7 +14,8 @@ public class Peer implements Serializable{
     private Date registrationdate;
     private String reportingnode;
     private boolean isactive;
-    
+  
+   
     public Peer() {
     }
 
@@ -75,7 +76,7 @@ public class Peer implements Serializable{
     public void setIsactive(boolean isactive) {
         this.isactive = isactive;
     }    
-    
+          
     @Override
     public int hashCode() {
         int hash = 7;
