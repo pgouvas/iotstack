@@ -2,7 +2,7 @@ package eu.orchestrator.iotstack.iotagent;
 
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
 import eu.orchestrator.iotstack.iotagent.util.Util;
-import eu.orchestrator.iotstack.transfer.Node;
+import eu.orchestrator.transfer.entities.iotstack.Node;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;

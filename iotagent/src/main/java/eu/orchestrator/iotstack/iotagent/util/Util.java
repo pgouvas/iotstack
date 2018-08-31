@@ -1,16 +1,21 @@
 package eu.orchestrator.iotstack.iotagent.util;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
-import eu.orchestrator.iotstack.transfer.Node;
-import eu.orchestrator.iotstack.transfer.Peer;
+import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
+import eu.orchestrator.transfer.entities.iotstack.Node;
+import eu.orchestrator.transfer.entities.iotstack.Peer;
 import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -63,7 +68,7 @@ public class Util {
             case INITIATE_IPERF3:
                 cmdappend = "iperf3 -s -D";
                 break;
-                
+
             case KILL_IPERF3:
                 cmdappend = "ps -ef | grep iperf3 | awk '{print $2}' | xargs kill -9";
                 break;
@@ -75,8 +80,6 @@ public class Util {
         return cmd;
     }//GetCommandStatus
 
-
-    
     public static String executeCommandSingleLineOutput(String[] command) {
         StringBuffer output = new StringBuffer();
         Process p;
@@ -108,56 +111,114 @@ public class Util {
         return output.toString();
     }//EoM    
 
+    public static void setupConsul(String masterip, String privateip) {
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };
+        //1 - Stop Consul
+        String cmdappend = "sudo service consul stop";
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
+        logger.info("Consul Stop output: " + output);
+
+        String template = "#!/bin/bash\n"
+                + "mkdir -p /tmp/consul\n"
+                + "privateIP=" + privateip + "\n"
+                + "masterIP=" + masterip + "\n"
+                + "sudo /opt/consul agent -join=$masterIP -data-dir=/tmp/consul -bind=$privateIP -advertise=$privateIP -enable-script-checks=true -client=0.0.0.0 -config-dir=/etc/consul.d";
+
+        try {
+            FileWriter fileWriter = new FileWriter("/opt/scripts/consul-start.sh");
+            fileWriter.write(template);
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //Start consul
+        cmdappend = "sudo service consul start";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+        logger.info("Consul Start output: " + output);
+        logger.info("Consul Configured!");
+    }//EoM
+
+    public static void setupNetdata(String graphidlower, String graphinstanceidlower, String componentnodeidlower) {
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };
+        //1 - Stop Consul
+        String cmdappend = "sudo service netdata stop";
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
+        logger.info("Netdata Stop output: " + output);
+        
+        //2 - change config
+        cmdappend = "sudo sed -i -e \"s/\\[backend\\]/\\[backend\\]\\nprefix=netdata:" + graphidlower + ":" + graphinstanceidlower + ":" + componentnodeidlower + "/g\" /opt/netdata/etc/netdata/netdata.conf";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+
+        //3 - Start consul
+        cmdappend = "sudo service netdata start";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+        logger.info("Netdata Start output: " + output);
+    }//EoM    
+
     public static String initiateIPerf3D() {
         String output = executeCommandSingleLineOutput(GetCommandStatus(INITIATE_IPERF3));
 //        logger.info("|" + output + "|");
         return output;
     }
-    
+
     //TODO fix restart
     public static String killPerf3D() {
         String output = executeCommandSingleLineOutput(GetCommandStatus(KILL_IPERF3));
 //        logger.info("|" + output + "|");
         return output;
     }
-    
-    public static String measureBandwith(String nodeid){
-        String cmdappend = "iperf3 -c "+nodeid+" -t 5  -i 0 -f m  -P 2   | grep SUM | grep sender | awk '{print $6}'";
+
+    public static String measureBandwith(String nodeid) {
+        String cmdappend = "iperf3 -c " + nodeid + " -t 5  -i 0 -f m  -P 2   | grep SUM | grep sender | awk '{print $6}'";
         String[] cmd = {
             "/bin/sh",
             "-c",
             "" //will be filled by cmdappend
-        };  
-        cmd[2] = cmdappend;                
-        String output = executeCommandMultiLineOutput(cmd); 
+        };
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
         return output.trim();
     }//measureBandwith    
 
-    public static String measureRTTDelay(String nodeid){
-        String cmdappend = "ping6 "+nodeid+" -c 5 | grep rtt | cut -d/ -f5";
+    public static String measureRTTDelay(String nodeid) {
+        String cmdappend = "ping6 " + nodeid + " -c 5 | grep rtt | cut -d/ -f5";
         String[] cmd = {
             "/bin/sh",
             "-c",
             "" //will be filled by cmdappend
-        };  
-        cmd[2] = cmdappend;                
-        String output = executeCommandMultiLineOutput(cmd); 
+        };
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
         return output.trim();
     }//measureRTTDelay
-    
-    public static String measurePacketLoss(String nodeid){
-        String cmdappend = "ping6 "+nodeid+" -c 5 | grep loss | cut -d, -f3 | cut -d% -f1";
+
+    public static String measurePacketLoss(String nodeid) {
+        String cmdappend = "ping6 " + nodeid + " -c 5 | grep loss | cut -d, -f3 | cut -d% -f1";
         String[] cmd = {
             "/bin/sh",
             "-c",
             "" //will be filled by cmdappend
-        };  
-        cmd[2] = cmdappend;                
-        String output = executeCommandMultiLineOutput(cmd); 
+        };
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
         return output.trim();
     }//measurePacketLoss    
-    
-    
+
     public static int getVCPUs() {
         int ret = 0;
         String output = executeCommandSingleLineOutput(GetCommandStatus(COMMAND_GET_VCPUS));
@@ -257,6 +318,19 @@ public class Util {
             ret = false;
         }
         return ret;
+    }//EoM    
+
+    public static void notifyAdjacentNodesForGateway(CommandBroadcastUpdateGateway cug, String targetid) {
+        logger.info("Notifying notifyAdjacentNodesForGateway " + targetid + "  for gateway: " + cug.getGatewayid());
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://[" + targetid + "]:8080/api/v1/gateway";
+        try {
+            //logger.info("Performing rest");
+            restTemplate.postForObject(url, cug, String.class);
+            //logger.info("Response at " + targetid);
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
     }//EoM    
 
 }//EoC

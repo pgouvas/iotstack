@@ -1,13 +1,17 @@
 package eu.orchestrator.iotstack.iotagent.synch;
 
+import eu.orchestrator.iotstack.iotagent.IoTAgent;
+import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.util.Util;
-import eu.orchestrator.iotstack.transfer.Peer;
+import eu.orchestrator.transfer.entities.iotstack.IoTBootRequest;
+import eu.orchestrator.transfer.entities.iotstack.Peer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,9 +20,25 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SynchExecutors {
-
+    
+    @Autowired
+    AsyncExecutors asynch;
+    
     private static final Logger logger = Logger.getLogger(SynchExecutors.class.getName());
 
+    public String handleDeployRequest(IoTBootRequest request){
+        String ret="Error";
+        //Step 1 - Configure Consul
+        Util.setupConsul(request.getMasterIPv6(), IoTAgent.nodeid);
+        //Step 2 - Configure Netadata
+        Util.setupNetdata(request.getGraphID().toLowerCase(), request.getGraphInstanceID().toLowerCase(), request.getComponentNodeID().toLowerCase());
+        //Step 3 - Call Async to start agent
+        asynch.bootAgent(request);
+        
+        return IoTAgent.nodeid;
+    }//EoM
+    
+    
     public List<Peer> getNodeConfigurationState(List<Peer> addlist) {
         List<Peer> retlist = new ArrayList<>();
         //define an executor pool
@@ -51,6 +71,6 @@ public class SynchExecutors {
         }
 
         return retlist;
-    }//EoM
+    }//EoM getNodeConfigurationState
 
 }//EoC

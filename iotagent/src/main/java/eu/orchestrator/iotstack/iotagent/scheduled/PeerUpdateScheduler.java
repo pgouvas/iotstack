@@ -5,8 +5,8 @@ import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
 import eu.orchestrator.iotstack.iotagent.synch.SynchExecutors;
 import eu.orchestrator.iotstack.iotagent.util.Util;
-import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
-import eu.orchestrator.iotstack.transfer.Peer;
+import eu.orchestrator.transfer.entities.iotstack.CommandUnicastUpdatePeers;
+import eu.orchestrator.transfer.entities.iotstack.Peer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +37,7 @@ public class PeerUpdateScheduler {
     SynchExecutors synch;
     
     
-    @Scheduled(fixedRate = 3000)
+    @Scheduled(fixedRate = 5000)
     public void scanNeighborhoodAndReactOnChanges() {
         logger.info("scanNeighborhoodAndReactOnChanges: " + dateFormat.format(new Date()));
         List<Peer> freshlist = Util.getNeighbors();

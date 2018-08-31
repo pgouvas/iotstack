@@ -1,15 +1,17 @@
 package eu.orchestrator.iotstack.iotagent.async;
 
+import eu.orchestrator.agent.Agent;
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
 import eu.orchestrator.iotstack.iotagent.util.Util;
-import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
-import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
-import eu.orchestrator.iotstack.transfer.Node;
-import eu.orchestrator.iotstack.transfer.Nodestat;
-import eu.orchestrator.iotstack.transfer.ResponseCode;
-import eu.orchestrator.iotstack.transfer.RestResponse;
+import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
+import eu.orchestrator.transfer.entities.iotstack.CommandUnicastUpdatePeers;
+import eu.orchestrator.transfer.entities.iotstack.IoTBootRequest;
+import eu.orchestrator.transfer.entities.iotstack.Node;
+import eu.orchestrator.transfer.entities.iotstack.Nodestat;
+import eu.orchestrator.transfer.entities.iotstack.ResponseCode;
+import eu.orchestrator.transfer.entities.iotstack.RestResponse;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -93,7 +95,7 @@ public class AsyncExecutors {
         try {
             String output = Util.measureBandwith(node.getId());
             dbmanager.updateNodestatForBandwith(node.getId(), output);
-            logger.info("Bandwith for "+node.getId()+" : "+output);
+            logger.info("Bandwith for " + node.getId() + " : " + output);
         } catch (Exception ex) {
         }
     }//EoM        
@@ -103,8 +105,8 @@ public class AsyncExecutors {
         logger.info("MeasureRTTDelay for " + node.getId());
         try {
             String output = Util.measureRTTDelay(node.getId());
-            dbmanager.updateNodestatForRTTDelay(node.getId(), output);            
-            logger.info("RTTDelay for "+node.getId()+" : "+output);
+            dbmanager.updateNodestatForRTTDelay(node.getId(), output);
+            logger.info("RTTDelay for " + node.getId() + " : " + output);
         } catch (Exception ex) {
         }
     }//EoM  
@@ -114,10 +116,25 @@ public class AsyncExecutors {
         logger.info("MeasurePacketloss for " + node.getId());
         try {
             String output = Util.measurePacketLoss(node.getId());
-            dbmanager.updateNodestatForPacketLoss(node.getId(), output);                        
-            logger.info("Packetloss for "+node.getId()+" : "+output);
+            dbmanager.updateNodestatForPacketLoss(node.getId(), output);
+            logger.info("Packetloss for " + node.getId() + " : " + output);
         } catch (Exception ex) {
         }
     }//EoM           
+
+    @Async
+    public void bootAgent(IoTBootRequest request) {
+        Agent agent = new Agent();
+        String[] args = new String[7];
+        args[0] = request.getGraphID();
+        args[1] = request.getGraphInstanceID();
+        args[2] = request.getComponentNodeID();
+        args[3] = request.getComponentNodeInstanceID();
+        args[4] = (""+request.getFlag()).toLowerCase();
+        args[5] = (""+request.getLb()).toLowerCase();
+        args[6] = (""+request.getIpv6()).toLowerCase();
+        logger.info("Booting Agent");
+        agent.bootAgent(args);
+    }//EoM
 
 }//EoC

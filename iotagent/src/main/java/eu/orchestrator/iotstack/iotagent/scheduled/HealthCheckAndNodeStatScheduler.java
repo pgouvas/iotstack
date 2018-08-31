@@ -3,7 +3,7 @@ package eu.orchestrator.iotstack.iotagent.scheduled;
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
-import eu.orchestrator.iotstack.transfer.Node;
+import eu.orchestrator.transfer.entities.iotstack.Node;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;

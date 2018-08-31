@@ -1,16 +1,19 @@
 package eu.orchestrator.iotstack.iotagent.rest;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
+import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
-import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
-import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
-import eu.orchestrator.iotstack.transfer.Credentials;
-import eu.orchestrator.iotstack.transfer.InstanceModel;
-import eu.orchestrator.iotstack.transfer.Nodestat;
-import eu.orchestrator.iotstack.transfer.ResourceModel;
-import eu.orchestrator.iotstack.transfer.ResponseCode;
-import eu.orchestrator.iotstack.transfer.RestResponse;
-import eu.orchestrator.iotstack.transfer.Topology;
+import eu.orchestrator.iotstack.iotagent.synch.SynchExecutors;
+import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
+import eu.orchestrator.transfer.entities.iotstack.CommandUnicastUpdatePeers;
+import eu.orchestrator.transfer.entities.iotstack.Credentials;
+import eu.orchestrator.transfer.entities.iotstack.InstanceModel;
+import eu.orchestrator.transfer.entities.iotstack.IoTBootRequest;
+import eu.orchestrator.transfer.entities.iotstack.Nodestat;
+import eu.orchestrator.transfer.entities.iotstack.ResourceModel;
+import eu.orchestrator.transfer.entities.iotstack.ResponseCode;
+import eu.orchestrator.transfer.entities.iotstack.RestResponse;
+import eu.orchestrator.transfer.entities.iotstack.Topology;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -34,6 +37,12 @@ public class RestAgentController {
     @Autowired
     DBManager dbmanager;
 
+    @Autowired
+    SynchExecutors synch;
+    
+//    @Autowired
+//    AsyncExecutors asynch;    
+    
     @RequestMapping(value = "/nodeid", method = RequestMethod.GET)
     public String getNodeid() {
         return IoTAgent.nodeid;
@@ -97,10 +106,15 @@ public class RestAgentController {
     }//EoM      
 
     @RequestMapping(value = "/instance", method = RequestMethod.POST)
-    public RestResponse bootInstanceproxy(@RequestBody Credentials credentials,@RequestBody InstanceModel instance) {
+    public RestResponse bootInstanceproxy(@RequestBody IoTBootRequest bootrequest) {
         RestResponse response = new RestResponse();
         logger.info("Rest bootInstance received");
+        String deployid = synch.handleDeployRequest(bootrequest);
+        
         response.setRescode(ResponseCode.SUCCESS);
+        response.setMessage("Success");
+        response.setResobject(""+deployid);
+        
         logger.info("Rest bootInstance executed");
         return response;
     }//EoM      
@@ -109,6 +123,7 @@ public class RestAgentController {
     public RestResponse removeInstanceproxy(@RequestBody Credentials credentials,@PathVariable String instanceid) {
         RestResponse response = new RestResponse();
         logger.info("Rest removeInstance received");
+        
         response.setRescode(ResponseCode.SUCCESS);
         logger.info("Rest removeInstance executed");
         return response;

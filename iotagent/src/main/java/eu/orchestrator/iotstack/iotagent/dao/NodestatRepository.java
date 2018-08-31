@@ -1,6 +1,6 @@
 package eu.orchestrator.iotstack.iotagent.dao;
 
-import eu.orchestrator.iotstack.transfer.Nodestat;
+import eu.orchestrator.transfer.entities.iotstack.Nodestat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;

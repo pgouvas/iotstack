@@ -1,4 +1,4 @@
-package eu.orchestrator.iotstack.transfer;
+package eu.orchestrator.transfer.entities.iotstack;
 
 /**
  *

@@ -2,16 +2,17 @@ package eu.orchestrator.iotstack.iotagent.dao;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
-import eu.orchestrator.iotstack.transfer.CommandBroadcastUpdateGateway;
-import eu.orchestrator.iotstack.transfer.CommandUnicastUpdatePeers;
-import eu.orchestrator.iotstack.transfer.Credentials;
-import eu.orchestrator.iotstack.transfer.Node;
-import eu.orchestrator.iotstack.transfer.Nodestat;
-import eu.orchestrator.iotstack.transfer.Peer;
-import eu.orchestrator.iotstack.transfer.ResourceModel;
-import eu.orchestrator.iotstack.transfer.ResponseCode;
-import eu.orchestrator.iotstack.transfer.RestResponse;
-import eu.orchestrator.iotstack.transfer.Topology;
+import eu.orchestrator.iotstack.iotagent.util.Util;
+import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
+import eu.orchestrator.transfer.entities.iotstack.CommandUnicastUpdatePeers;
+import eu.orchestrator.transfer.entities.iotstack.Credentials;
+import eu.orchestrator.transfer.entities.iotstack.Node;
+import eu.orchestrator.transfer.entities.iotstack.Nodestat;
+import eu.orchestrator.transfer.entities.iotstack.Peer;
+import eu.orchestrator.transfer.entities.iotstack.ResourceModel;
+import eu.orchestrator.transfer.entities.iotstack.ResponseCode;
+import eu.orchestrator.transfer.entities.iotstack.RestResponse;
+import eu.orchestrator.transfer.entities.iotstack.Topology;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -36,8 +37,6 @@ public class DBManager {
     PeerRepository peerrepo;
     @Autowired
     NodestatRepository nodestatrepo;
-    @Autowired
-    AsyncExecutors async;
 
     @Transactional
     public void updatePeersLocal(List<Peer> addlist, List<Peer> dellist) {
@@ -97,7 +96,8 @@ public class DBManager {
             logger.info("DBManager.updateGateway will be sent to " + adjacentnodes.size());
             cbug.setSolicitorid(IoTAgent.nodeid);
             for (Node adjacentnode : adjacentnodes) {
-                async.notifyAdjacentNodesForGateway(cbug, adjacentnode.getId());
+                //TODO callables here
+                Util.notifyAdjacentNodesForGateway(cbug, adjacentnode.getId());
             }//for
             clogrepo.insert(new Commandlog(cbug.getCid(), cbug.getCdate()));
         } else {
