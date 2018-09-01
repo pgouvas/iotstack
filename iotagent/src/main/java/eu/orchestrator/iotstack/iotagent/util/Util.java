@@ -111,7 +111,69 @@ public class Util {
         return output.toString();
     }//EoM    
 
-    public static void setupConsul(String masterip, String privateip) {
+    public static void setupHosts(String nexusIPv6, String masterIPv6) {
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };
+        //1 - Stop Consul
+        String cmdappend = "sudo sed -i '/nexus/d' /etc/hosts";
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
+
+        cmdappend = "sudo sed -i '/master/d' /etc/hosts";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+
+        cmdappend = "sudo echo \"" + nexusIPv6 + " nexus \" >> /etc/hosts";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+
+        cmdappend = "sudo echo \"" + masterIPv6 + " master \" >> /etc/hosts";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+
+        logger.info("SetupHosts completed ");
+    }//EoM      
+
+    public static void setupDocker( ) {
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };
+        //1 - Stop Consul
+        String cmdappend = "sudo service docker stop";
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
+
+        String template = "{\n"
+                + " \"insecure-registries\" : [\n"
+                + "       \"nexus:39580\",\n"
+                + "       \"nexus:34522\"\n"
+                + "       ],\n"
+                + "       \"ipv6\": true,\n"
+                + "         \"fixed-cidr-v6\": \"2001:db8::/122\"\n"
+                + "}";
+
+        try {
+            FileWriter fileWriter = new FileWriter("/etc/docker/daemon.json");
+            fileWriter.write(template);
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //Start consul
+        cmdappend = "sudo service docker start";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+        logger.info("Docker Configured!");
+    }//EoM    
+
+    public static void setupConsul(String masterip, String privateip, String graphidlower, String graphinstanceidlower, String componentnodeidlower, String componentnodeinstanceidlower) {
         String[] cmd = {
             "/bin/sh",
             "-c",
@@ -122,12 +184,12 @@ public class Util {
         cmd[2] = cmdappend;
         String output = executeCommandMultiLineOutput(cmd);
         logger.info("Consul Stop output: " + output);
-
+        String nodename = graphidlower + "-" + graphinstanceidlower + "-" + componentnodeidlower + "-" + componentnodeinstanceidlower;
         String template = "#!/bin/bash\n"
                 + "mkdir -p /tmp/consul\n"
                 + "privateIP=" + privateip + "\n"
                 + "masterIP=" + masterip + "\n"
-                + "sudo /opt/consul agent -join=$masterIP -data-dir=/tmp/consul -bind=$privateIP -advertise=$privateIP -enable-script-checks=true -client=0.0.0.0 -config-dir=/etc/consul.d";
+                + "sudo /opt/consul agent -join=$masterIP -data-dir=/tmp/consul -bind=$privateIP -node=" + nodename + " -advertise=$privateIP -enable-script-checks=true -client=0.0.0.0 -config-dir=/etc/consul.d";
 
         try {
             FileWriter fileWriter = new FileWriter("/opt/scripts/consul-start.sh");
@@ -157,7 +219,7 @@ public class Util {
         cmd[2] = cmdappend;
         String output = executeCommandMultiLineOutput(cmd);
         logger.info("Netdata Stop output: " + output);
-        
+
         //2 - change config
         cmdappend = "sudo sed -i -e \"s/\\[backend\\]/\\[backend\\]\\nprefix=netdata:" + graphidlower + ":" + graphinstanceidlower + ":" + componentnodeidlower + "/g\" /opt/netdata/etc/netdata/netdata.conf";
         cmd[2] = cmdappend;

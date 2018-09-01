@@ -38,6 +38,8 @@ public class IoTBootRequest implements Serializable {
     private Integer ram;
     private Integer storage;
 
+    private String nexusIPv6;
+
     public String getId() {
         return id;
     }
@@ -189,5 +191,12 @@ public class IoTBootRequest implements Serializable {
     public void setStorage(Integer storage) {
         this.storage = storage;
     }
-    
-}//EoC
+
+    public String getNexusIPv6() {
+        return nexusIPv6;
+    }
+
+    public void setNexusIPv6(String nexusIPv6) {
+        this.nexusIPv6 = nexusIPv6;
+    }
+}

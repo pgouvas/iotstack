@@ -28,11 +28,15 @@ public class SynchExecutors {
 
     public String handleDeployRequest(IoTBootRequest request){
         String ret="Error";
-        //Step 1 - Configure Consul
-        Util.setupConsul(request.getMasterIPv6(), IoTAgent.nodeid);
-        //Step 2 - Configure Netadata
+        //Step 1 - Configure Host entry for nexus 
+        Util.setupHosts(request.getNexusIPv6(), request.getMasterIPv6());
+        //Step 2 - Configure Docker
+        Util.setupDocker();
+        //Step 2 - Configure Consul
+        Util.setupConsul(request.getMasterIPv6(), IoTAgent.nodeid, request.getGraphID().toLowerCase(), request.getGraphInstanceID().toLowerCase() , request.getComponentNodeID().toLowerCase(), request.getComponentNodeInstanceID().toLowerCase());
+        //Step 3 - Configure Netadata
         Util.setupNetdata(request.getGraphID().toLowerCase(), request.getGraphInstanceID().toLowerCase(), request.getComponentNodeID().toLowerCase());
-        //Step 3 - Call Async to start agent
+        //Step 4 - Call Async to start agent
         asynch.bootAgent(request);
         
         return IoTAgent.nodeid;
