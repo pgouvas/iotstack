@@ -9,6 +9,7 @@ import eu.orchestrator.transfer.entities.iotstack.CommandUnicastUpdatePeers;
 import eu.orchestrator.transfer.entities.iotstack.Credentials;
 import eu.orchestrator.transfer.entities.iotstack.InstanceModel;
 import eu.orchestrator.transfer.entities.iotstack.IoTBootRequest;
+import eu.orchestrator.transfer.entities.iotstack.IoTRemoveInstance;
 import eu.orchestrator.transfer.entities.iotstack.Nodestat;
 import eu.orchestrator.transfer.entities.iotstack.ResourceModel;
 import eu.orchestrator.transfer.entities.iotstack.ResponseCode;
@@ -108,7 +109,23 @@ public class RestAgentController {
     @RequestMapping(value = "/instance", method = RequestMethod.POST)
     public RestResponse bootInstanceproxy(@RequestBody IoTBootRequest bootrequest) {
         RestResponse response = new RestResponse();
-        logger.info("Rest bootInstance received");
+        logger.info("Create Instance received");
+        
+        String deployid = synch.findAvailableResourceAndDeploy(bootrequest);
+        
+        response.setRescode(ResponseCode.SUCCESS);
+        response.setMessage("Success");
+        response.setResobject(""+deployid);
+        
+        logger.info("Rest bootInstance executed");
+        return response;
+    }//EoM      
+    
+    @RequestMapping(value = "/bootinstance", method = RequestMethod.POST)
+    public RestResponse bootInstance(@RequestBody IoTBootRequest bootrequest) {
+        RestResponse response = new RestResponse();
+        logger.info("Create Instance received");
+        
         String deployid = synch.handleDeployRequest(bootrequest);
         
         response.setRescode(ResponseCode.SUCCESS);
@@ -119,8 +136,8 @@ public class RestAgentController {
         return response;
     }//EoM      
 
-    @RequestMapping(value = "/instance/{instanceid}", method = RequestMethod.DELETE)
-    public RestResponse removeInstanceproxy(@RequestBody Credentials credentials,@PathVariable String instanceid) {
+    @RequestMapping(value = "/deleteinstance", method = RequestMethod.DELETE)
+    public RestResponse removeInstanceproxy(@RequestBody IoTRemoveInstance delrequest) {
         RestResponse response = new RestResponse();
         logger.info("Rest removeInstance received");
         

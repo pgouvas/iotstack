@@ -22,7 +22,9 @@ public class Nodestat implements Serializable {
     private String bandwith;
     private String rttdelay;
     private String packetloss;
-
+    private String container;
+    
+    
     public Nodestat() {
     }
 
@@ -125,6 +127,14 @@ public class Nodestat implements Serializable {
     public void setPacketloss(String packetloss) {
         this.packetloss = packetloss;
     }    
+
+    public String getContainer() {
+        return container;
+    }
+
+    public void setContainer(String container) {
+        this.container = container;
+    }       
     
     @Override
     public int hashCode() {

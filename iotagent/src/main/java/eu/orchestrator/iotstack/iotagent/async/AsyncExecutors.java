@@ -61,11 +61,9 @@ public class AsyncExecutors {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://[" + targetid + "]:8080/api/v1/gateway";
         try {
-            //logger.info("Performing rest");
             restTemplate.postForObject(url, cug, String.class);
-            //logger.info("Response at " + targetid);
         } catch (Exception ex) {
-            logger.severe(ex.getMessage());
+            logger.severe("Node "+targetid +" was considered active but Gateway notification failed."); //TODO make target inactive
         }
     }//EoM
 
@@ -86,6 +84,7 @@ public class AsyncExecutors {
             }//if
         } catch (Exception ex) {
             logger.severe("Communication Exception. Node not reachable or Agent not running for " + node.getId());
+            //TODO make it inactive
         }
     }//EoM
 
@@ -135,6 +134,20 @@ public class AsyncExecutors {
         args[6] = (""+request.getIpv6()).toLowerCase();
         logger.info("Booting Agent");
         agent.bootAgent(args);
+    }//EoM
+    
+    @Async
+    public void forwardDeploymentRequestToNode(String nodeid, IoTBootRequest request) {
+        logger.info("forwardDeploymentRequestToNode " + nodeid + "  for request: " + request.getGraphInstanceID() );
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://[" + nodeid + "]:8080/api/v1/bootinstance";
+        try {
+            //logger.info("Performing rest");
+            restTemplate.postForObject(url, request, IoTBootRequest.class);
+            //logger.info("Response at " + targetid);
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
     }//EoM
 
 }//EoC

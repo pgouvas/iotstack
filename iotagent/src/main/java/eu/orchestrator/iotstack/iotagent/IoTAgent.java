@@ -71,6 +71,8 @@ public class IoTAgent {
         node.setTotalmemory(totalmemory);
         //persist to database
         noderepo.insert(node);
+        //shutdown consul if running
+        Util.shutdownConsul();
         //initialize ip3rf3 Daemon
         Util.killPerf3D();
         Util.initiateIPerf3D();

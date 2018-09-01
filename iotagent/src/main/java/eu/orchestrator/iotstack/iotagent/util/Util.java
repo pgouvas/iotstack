@@ -111,6 +111,18 @@ public class Util {
         return output.toString();
     }//EoM    
 
+    public static void shutdownConsul() {
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };
+        //1 - Stop Consul
+        String cmdappend = "sudo service consul stop";
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
+    } //EoM    
+
     public static void setupHosts(String nexusIPv6, String masterIPv6) {
         String[] cmd = {
             "/bin/sh",
@@ -137,7 +149,7 @@ public class Util {
         logger.info("SetupHosts completed ");
     }//EoM      
 
-    public static void setupDocker( ) {
+    public static void setupDocker() {
         String[] cmd = {
             "/bin/sh",
             "-c",
@@ -183,7 +195,7 @@ public class Util {
         String cmdappend = "sudo service consul stop";
         cmd[2] = cmdappend;
         String output = executeCommandMultiLineOutput(cmd);
-        logger.info("Consul Stop output: " + output);
+
         String nodename = graphidlower + "-" + graphinstanceidlower + "-" + componentnodeidlower + "-" + componentnodeinstanceidlower;
         String template = "#!/bin/bash\n"
                 + "mkdir -p /tmp/consul\n"

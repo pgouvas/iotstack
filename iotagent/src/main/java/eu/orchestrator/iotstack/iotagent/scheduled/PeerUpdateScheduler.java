@@ -57,7 +57,7 @@ public class PeerUpdateScheduler {
         }//for         
         if (addlist.size() > 0 || dellist.size() > 0) {
             //check which of the nodes are active (i.e. agent is running)
-            addlist = synch.getNodeConfigurationState(addlist);
+            addlist = synch.getNodeState(addlist);
             logger.info("activelist: "+addlist);
             //update database
             dbmanager.updatePeersLocal(addlist, dellist);

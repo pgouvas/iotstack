@@ -33,14 +33,15 @@ public class GatewaySolicitationScheduler {
     @Autowired
     AsyncExecutors async;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     public void broadcastGateway() {
-        logger.info("broadcastGateway: " + dateFormat.format(new Date()));
+        logger.info("BroadcastGateway: " + dateFormat.format(new Date()));
         if (IoTAgent.isGateway()) {
             //Each creation of broadcast is accompanied by log entry
             CommandBroadcastUpdateGateway cug = new CommandBroadcastUpdateGateway(IoTAgent.nodeid,IoTAgent.nodeid,IoTAgent.nodeid);
             clrepo.insert(new Commandlog(cug.getCid(), new Date()));
-            logger.info("Broadcast "+cug.getCid()+" created and ready to be sent");
+            
+//            logger.info("Broadcast "+cug.getCid()+" created and ready to be sent");
             //TODO The logic may go to sych executors
             List<Node> adjacentnodes = peerrepo.getAdjacentActiveNodes(IoTAgent.nodeid);
             for (Node adjacentnode : adjacentnodes) {

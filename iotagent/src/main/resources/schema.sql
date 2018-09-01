@@ -32,6 +32,7 @@ CREATE TABLE nodestat
    bandwidth varchar(40),
    rttdelay varchar(40),
    packetloss varchar(40),
+   container varchar(500) default null,
    primary key(nodeid)
 );
 

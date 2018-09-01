@@ -13,6 +13,7 @@ import eu.orchestrator.transfer.entities.iotstack.ResourceModel;
 import eu.orchestrator.transfer.entities.iotstack.ResponseCode;
 import eu.orchestrator.transfer.entities.iotstack.RestResponse;
 import eu.orchestrator.transfer.entities.iotstack.Topology;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -57,7 +58,7 @@ public class DBManager {
         }
     }//EoM
 
-    //--------------------Commands Handling    
+    //--------------------Commands Handling-----------------    
     @Transactional
     public void updatePeersRemote(CommandUnicastUpdatePeers updatecommand) {
         List<Peer> addlist = updatecommand.getAddlist();
@@ -67,13 +68,20 @@ public class DBManager {
             peerrepo.deleteById(peer.getFromnode(), peer.getTonode());
         }
 
+        List<Peer> toremove = new ArrayList<>();
         //Prevent douples
         List<Peer> existinglist = peerrepo.findAll();
         for (Peer addpeer : addlist) {
             if (existinglist.contains(addpeer)) {
-                addlist.remove(addpeer);
+                toremove.add(addpeer);
+                //addlist.remove(addpeer);
             }
-        }//for         
+        }//for
+        
+        //actual removing
+        for (Peer peer : toremove) {
+            addlist.remove(peer);
+        }
 
         for (Peer peer : addlist) {
             peerrepo.insert(peer);
@@ -152,7 +160,7 @@ public class DBManager {
         nodestat.setBandwith(bandwidth);
         nodestatrepo.update(nodestat);
     }//EoM    
-    
+
     @Transactional
     public void updateNodestatForRTTDelay(String nodeid, String rttdelay) {
         logger.info("DBManager updating nodestats for rttdelay" + nodeid);
@@ -160,7 +168,7 @@ public class DBManager {
         nodestat.setRttdelay(rttdelay);
         nodestatrepo.update(nodestat);
     }//EoM
-    
+
     @Transactional
     public void updateNodestatForPacketLoss(String nodeid, String packetloss) {
         logger.info("DBManager updating nodestats for packetloss" + nodeid);
