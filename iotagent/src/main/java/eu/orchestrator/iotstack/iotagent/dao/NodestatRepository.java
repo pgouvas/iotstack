@@ -59,15 +59,35 @@ public class NodestatRepository {
     }//EoM
 
     public int insert(Nodestat nodestat) {
-        return jdbcTemplate.update("insert into nodestat (nodeid,gateway,osarch,osname,bootdate,vcpus,cpuspeed,totalmemory, checkdate,bandwidth,rttdelay,packetloss,container) " + "values(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getVcpus(), nodestat.getCpuspeed(), nodestat.getTotalmemory(), nodestat.getCheckdate() , nodestat.getBandwith(), nodestat.getRttdelay(), nodestat.getPacketloss(), nodestat.getContainer() });
+        return jdbcTemplate.update("insert into nodestat (nodeid,gateway,osarch,osname,bootdate,vcpus,cpuspeed,totalmemory, checkdate,container) " + "values(?,?,?,?,?,?,?,?,?,?)",
+                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getVcpus(), nodestat.getCpuspeed(), nodestat.getTotalmemory(), nodestat.getCheckdate() , nodestat.getContainer() });
     }//EoM
 
-    public int update(Nodestat nodestat) {
-        return jdbcTemplate.update("update nodestat " + " set nodeid = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ?, checkdate = ? , bandwidth = ? , rttdelay = ? , packetloss = ? , container = ?   where nodeid = ?",
-                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getCheckdate(), nodestat.getBandwith(), nodestat.getRttdelay(), nodestat.getPacketloss(), nodestat.getContainer(), nodestat.getNodeid()});
+    public int updateRemote(Nodestat nodestat) {
+        return jdbcTemplate.update("update nodestat " + " set nodeid = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ?, checkdate = ? , container = ?   where nodeid = ?",
+                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getCheckdate(), nodestat.getContainer(), nodestat.getNodeid()});
     }//EoM
 
+    public int updateLocalRttdelay(String value, String nodeid) {
+        return jdbcTemplate.update("update nodestat " + " set  rttdelay = ?  where nodeid = ?",
+                new Object[]{ value,  nodeid});
+    }//EoM
+    
+    public int updateLocalBandwidth(String value, String nodeid) {
+        return jdbcTemplate.update("update nodestat " + " set  bandwidth = ?  where nodeid = ?",
+                new Object[]{ value,  nodeid });
+    }//EoM    
+    
+    public int updateLocalPacketloss(String value, String nodeid) {
+        return jdbcTemplate.update("update nodestat " + " set  packetloss = ?  where nodeid = ?",
+                new Object[]{  value,  nodeid });
+    }//EoM    
+    
+    public int updateLocalContainer(String value, String nodeid) {
+        return jdbcTemplate.update("update nodestat " + " set  container = ?  where nodeid = ?",
+                new Object[]{  value,  nodeid });
+    }//EoM        
+    
     class IntRowMapper implements RowMapper<Integer> {
 
         @Override

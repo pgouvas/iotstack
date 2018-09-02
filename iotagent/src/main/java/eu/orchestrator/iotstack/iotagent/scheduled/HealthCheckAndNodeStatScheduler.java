@@ -2,6 +2,7 @@ package eu.orchestrator.iotstack.iotagent.scheduled;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
+import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
 import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
 import eu.orchestrator.transfer.entities.iotstack.Node;
 import java.text.SimpleDateFormat;
@@ -25,13 +26,18 @@ public class HealthCheckAndNodeStatScheduler {
     @Autowired
     PeerRepository peerrepo;
     @Autowired
+    NodeRepository noderepo;
+    @Autowired
     AsyncExecutors async;
 
     @Scheduled(fixedRate = 10000)
     public void getNodeStats() {
         if (IoTAgent.isGateway()) {
+            //If only the gateway is active then the following call will include it
             List<Node> allnodes = peerrepo.getAllActiveAnnouncedNodes();
-            logger.info("getNodeStats: for " + allnodes.size() + " nodes " + dateFormat.format(new Date()));
+            Node mynode = noderepo.findById(IoTAgent.nodeid).get(0);
+            if (!allnodes.contains(mynode)) allnodes.add(mynode);
+            logger.info("Scheduled getNodeStats for " + allnodes.size() + " nodes " + dateFormat.format(new Date()));
             for (Node node : allnodes) {
                 async.getNodeStats(node);
             }//for

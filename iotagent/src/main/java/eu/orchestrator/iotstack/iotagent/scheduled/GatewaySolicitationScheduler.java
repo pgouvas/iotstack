@@ -35,15 +35,13 @@ public class GatewaySolicitationScheduler {
 
     @Scheduled(fixedRate = 10000)
     public void broadcastGateway() {
-        logger.info("BroadcastGateway: " + dateFormat.format(new Date()));
+        logger.info("Scheduled BroadcastGateway: " + dateFormat.format(new Date()));
         if (IoTAgent.isGateway()) {
             //Each creation of broadcast is accompanied by log entry
             CommandBroadcastUpdateGateway cug = new CommandBroadcastUpdateGateway(IoTAgent.nodeid,IoTAgent.nodeid,IoTAgent.nodeid);
             clrepo.insert(new Commandlog(cug.getCid(), new Date()));
-            
-//            logger.info("Broadcast "+cug.getCid()+" created and ready to be sent");
-            //TODO The logic may go to sych executors
-            List<Node> adjacentnodes = peerrepo.getAdjacentActiveNodes(IoTAgent.nodeid);
+            //get All nodes and not only reported Alive
+            List<Node> adjacentnodes = peerrepo.getAdjacentNodes(IoTAgent.nodeid);
             for (Node adjacentnode : adjacentnodes) {
                 async.notifyAdjacentNodesForGateway(cug,adjacentnode.getId());                
             }//for

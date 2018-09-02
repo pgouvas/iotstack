@@ -40,10 +40,11 @@ public class PeerUpdateScheduler {
     @Scheduled(fixedRate = 5000)
     public void scanNeighborhoodAndReactOnChanges() {
         logger.info("scanNeighborhoodAndReactOnChanges: " + dateFormat.format(new Date()));
-        List<Peer> freshlist = Util.getNeighbors();
-        List<Peer> existinglist = peerrepo.findAll();
+        List<Peer> freshlist = Util.getNeighbors();     //get from physical
+        List<Peer> existinglist = peerrepo.findAllActive();   //get active
         List<Peer> addlist = new ArrayList<>();
         List<Peer> dellist = new ArrayList<>();
+        
         //prevent doubles logic
         for (Peer newpeer : freshlist) {
             if (!existinglist.contains(newpeer)) {
@@ -57,8 +58,7 @@ public class PeerUpdateScheduler {
         }//for         
         if (addlist.size() > 0 || dellist.size() > 0) {
             //check which of the nodes are active (i.e. agent is running)
-            addlist = synch.getNodeState(addlist);
-            logger.info("activelist: "+addlist);
+            addlist = synch.getNodeState(addlist);  //logger.info("status of added: "+addlist);
             //update database
             dbmanager.updatePeersLocal(addlist, dellist);
             //notify gateway

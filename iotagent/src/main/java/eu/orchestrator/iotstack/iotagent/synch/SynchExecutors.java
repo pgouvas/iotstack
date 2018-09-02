@@ -40,7 +40,7 @@ public class SynchExecutors {
             deploymentid = selectednode.getNodeid()+"_"+request.getGraphID()+"_"+request.getGraphInstanceID()+"_"+request.getComponentNodeID()+"_"+request.getComponentNodeInstanceID();
             //save
             selectednode.setContainer(deploymentid);
-            nodestatrepo.update(selectednode);
+            nodestatrepo.updateLocalContainer(deploymentid,selectednode.getNodeid()); //update container also in local
             //communicate to node and trigger deployment
             asynch.forwardDeploymentRequestToNode(selectednode.getNodeid(), request);
         }//if

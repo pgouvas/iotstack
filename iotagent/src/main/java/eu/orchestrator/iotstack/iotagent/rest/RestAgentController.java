@@ -1,7 +1,6 @@
 package eu.orchestrator.iotstack.iotagent.rest;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
-import eu.orchestrator.iotstack.iotagent.async.AsyncExecutors;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
 import eu.orchestrator.iotstack.iotagent.synch.SynchExecutors;
 import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,7 +74,7 @@ public class RestAgentController {
     public RestResponse getNodestats() {
         RestResponse<Nodestat> response = new RestResponse();
         logger.info("Rest getNodestats received");
-        Nodestat nodestat = dbmanager.getNodestats();
+        Nodestat nodestat = dbmanager.getNodestatsForRemoteReporting(); //exclude bandwith rttdelay packetloss
         response.setRescode(ResponseCode.SUCCESS);
         response.setResobject(nodestat);
         logger.info("Rest getNodestats executed");

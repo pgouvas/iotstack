@@ -45,13 +45,21 @@ public class DBManager {
         for (Peer peer : dellist) {
             peerrepo.deleteById(peer.getFromnode(), peer.getTonode());
         }
+
+        List<Peer> toremove = new ArrayList<>();
         //check douples
         List<Peer> existinglist = peerrepo.findAll();
         for (Peer addpeer : addlist) {
             if (existinglist.contains(addpeer)) {
-                addlist.remove(addpeer);
+                toremove.add(addpeer);
+                //addlist.remove(addpeer);
             }
         }//for         
+
+        //actual removing
+        for (Peer peer : toremove) {
+            addlist.remove(peer);
+        }
 
         for (Peer peer : addlist) {
             peerrepo.insert(peer);
@@ -77,7 +85,7 @@ public class DBManager {
                 //addlist.remove(addpeer);
             }
         }//for
-        
+
         //actual removing
         for (Peer peer : toremove) {
             addlist.remove(peer);
@@ -128,7 +136,7 @@ public class DBManager {
     }//EoM
 
     @Transactional
-    public Nodestat getNodestats() {
+    public Nodestat getNodestatsForRemoteReporting() {
         Node node = noderepo.findById(IoTAgent.nodeid).get(0);
         Nodestat nodestat = new Nodestat();
         nodestat.setNodeid(node.getId());
@@ -149,32 +157,26 @@ public class DBManager {
         if (nodestatrepo.findById(nodestat.getNodeid()).isEmpty()) {
             nodestatrepo.insert(nodestat);
         } else {
-            nodestatrepo.update(nodestat);
+            nodestatrepo.updateRemote(nodestat);
         }
     }//EoM
 
     @Transactional
     public void updateNodestatForBandwith(String nodeid, String bandwidth) {
-        logger.info("DBManager updating nodestats for bandwidth" + nodeid);
-        Nodestat nodestat = nodestatrepo.findById(nodeid).get(0);
-        nodestat.setBandwith(bandwidth);
-        nodestatrepo.update(nodestat);
+//        logger.info("DBManager updating nodestats for bandwidth" + nodeid);
+        nodestatrepo.updateLocalBandwidth(bandwidth, nodeid);
     }//EoM    
 
     @Transactional
     public void updateNodestatForRTTDelay(String nodeid, String rttdelay) {
-        logger.info("DBManager updating nodestats for rttdelay" + nodeid);
-        Nodestat nodestat = nodestatrepo.findById(nodeid).get(0);
-        nodestat.setRttdelay(rttdelay);
-        nodestatrepo.update(nodestat);
+//        logger.info("DBManager updating nodestats for rttdelay" + nodeid);
+        nodestatrepo.updateLocalRttdelay(rttdelay, nodeid);
     }//EoM
 
     @Transactional
     public void updateNodestatForPacketLoss(String nodeid, String packetloss) {
-        logger.info("DBManager updating nodestats for packetloss" + nodeid);
-        Nodestat nodestat = nodestatrepo.findById(nodeid).get(0);
-        nodestat.setPacketloss(packetloss);
-        nodestatrepo.update(nodestat);
+//        logger.info("DBManager updating nodestats for packetloss" + nodeid);
+        nodestatrepo.updateLocalPacketloss(packetloss, nodeid);
     }//EoM    
 
     @Transactional

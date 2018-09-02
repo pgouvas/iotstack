@@ -4,6 +4,7 @@ import eu.orchestrator.agent.Agent;
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.iotstack.iotagent.dao.DBManager;
 import eu.orchestrator.iotstack.iotagent.dao.NodeRepository;
+import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
 import eu.orchestrator.iotstack.iotagent.util.Util;
 import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
 import eu.orchestrator.transfer.entities.iotstack.CommandUnicastUpdatePeers;
@@ -33,10 +34,12 @@ public class AsyncExecutors {
     private static final Logger logger = Logger.getLogger(AsyncExecutors.class.getName());
 
     @Autowired
+    DBManager dbmanager;    
+    @Autowired
     NodeRepository noderepo;
     @Autowired
-    DBManager dbmanager;
-
+    PeerRepository peerrepo;
+    
     @Async
     public void notifyGatewayForPeerChanges(CommandUnicastUpdatePeers cup) {
         Node node = noderepo.findById(IoTAgent.nodeid).get(0);
@@ -46,9 +49,7 @@ public class AsyncExecutors {
             RestTemplate restTemplate = new RestTemplate();
             String url = "http://[" + gateway + "]:8080/api/v1/peers";
             try {
-                //logger.info("Performing rest");
                 restTemplate.postForObject(url, cup, String.class);
-                //logger.info("Response at " + gateway);
             } catch (Exception ex) {
                 logger.severe(ex.getMessage());
             }
@@ -57,21 +58,22 @@ public class AsyncExecutors {
 
     @Async
     public void notifyAdjacentNodesForGateway(CommandBroadcastUpdateGateway cug, String targetid) {
-        logger.info("Notifying notifyAdjacentNodesForGateway " + targetid + "  for gateway: " + cug.getGatewayid());
+        logger.info("notifyAdjacentNodesForGateway " + targetid + "  for gateway: " + cug.getGatewayid());
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://[" + targetid + "]:8080/api/v1/gateway";
         try {
             restTemplate.postForObject(url, cug, String.class);
         } catch (Exception ex) {
-            logger.severe("Node "+targetid +" was considered active but Gateway notification failed."); //TODO make target inactive
+            logger.info("Peer to "+targetid +" was considered active but notifyAdjacentNodesForGateway failed."); 
+            peerrepo.updateStatus(IoTAgent.nodeid, targetid, false);
         }
     }//EoM
 
     @Async
-    public void getNodeStats(Node node) {
-        logger.info("getNodeStats for " + node.getId());
+    public void getNodeStats(Node targetnode) {
+        logger.info("getNodeStats for " + targetnode.getId());
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://[" + node.getId() + "]:8080/api/v1/nodestats";
+        String url = "http://[" + targetnode.getId() + "]:8080/api/v1/nodestats";
         try {
             //logger.info("Performing rest");
             ParameterizedTypeReference<RestResponse<Nodestat>> typeref = new ParameterizedTypeReference<RestResponse<Nodestat>>() {
@@ -83,8 +85,8 @@ public class AsyncExecutors {
                 dbmanager.updateNodestat(nodestat);
             }//if
         } catch (Exception ex) {
-            logger.severe("Communication Exception. Node not reachable or Agent not running for " + node.getId());
-            //TODO make it inactive
+            logger.info("Peer to "+targetnode.getId() +" was considered active but notifyAdjacentNodesForGateway failed."); 
+            peerrepo.updateStatus(IoTAgent.nodeid, targetnode.getId(), false);
         }
     }//EoM
 
