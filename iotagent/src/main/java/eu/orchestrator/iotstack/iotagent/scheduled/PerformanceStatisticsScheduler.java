@@ -34,7 +34,7 @@ public class PerformanceStatisticsScheduler {
     public void getNodePerformanceStats() {
         if (IoTAgent.isGateway()) {
             //If only the gateway is active then the following call will exclude it
-            List<Node> allnodes = peerrepo.getAllActiveAnnouncedNodes();
+            List<Node> allnodes = peerrepo.getAllActiveAnnouncedPeers();
             Node mynode = noderepo.findById(IoTAgent.nodeid).get(0);            
             if (!allnodes.contains(mynode)) allnodes.add(mynode);            
             logger.info("Scheduled getNodePerformanceStats: " + dateFormat.format(new Date()));

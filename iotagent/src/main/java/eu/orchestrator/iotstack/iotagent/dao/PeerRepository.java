@@ -83,7 +83,7 @@ public class PeerRepository {
 //    public List<Node> getAllPublishedNodes() {
 //        return jdbcTemplate.query("select distinct * from (select tonode from peer union select fromnode from peer) ", new PeerNodeRowMapper());
 //    }    
-    public List<Node> getAllActiveAnnouncedNodes() {
+    public List<Node> getAllActiveAnnouncedPeers() {
         return jdbcTemplate.query("select distinct * from (select tonode from peer where isactive=true union select fromnode from peer where isactive=true) ", new PeerNodeRowMapper());
     }
 

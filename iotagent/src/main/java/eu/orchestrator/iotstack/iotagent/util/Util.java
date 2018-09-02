@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -382,13 +381,12 @@ public class Util {
         logger.info("Invoking service getNodeId at " + ipv6);
         try {
             response = restTemplate.getForObject(url, String.class);
-            //logger.info("Response at " + ipv6);
             if (response.equalsIgnoreCase(response)) {
                 ret = true;
             }
             logger.info("Service " + ipv6 + " active");
         } catch (Exception ex) {
-            logger.severe(url + " is unreachable");
+            logger.info("Peer to "+ipv6 +" was considered active but invokeRestGetNodeId failed."); //TODO
             ret = false;
         }
         return ret;
@@ -399,9 +397,7 @@ public class Util {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://[" + targetid + "]:8080/api/v1/gateway";
         try {
-            //logger.info("Performing rest");
             restTemplate.postForObject(url, cug, String.class);
-            //logger.info("Response at " + targetid);
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
         }
