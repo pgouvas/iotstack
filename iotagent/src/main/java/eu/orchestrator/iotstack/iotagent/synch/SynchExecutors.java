@@ -15,7 +15,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -37,20 +39,27 @@ public class SynchExecutors {
     public String findAvailableResourceAndDeploy(IoTBootRequest request) {
         String deploymentid = "";
         List<Nodestat> availableresources = nodestatrepo.findAllAvailable();
+        logger.info("**** nodestatrepo.findAllAvailable() "+availableresources.size());
+            
         if (!availableresources.isEmpty()) {
             Nodestat selectednode = availableresources.get(0);
             deploymentid = selectednode.getNodeid() + "_" + request.getGraphID() + "_" + request.getGraphInstanceID() + "_" + request.getComponentNodeID() + "_" + request.getComponentNodeInstanceID();
+            logger.info("**** deploymentid: "+deploymentid);
+        
             //save
             selectednode.setContainer(deploymentid);
             nodestatrepo.updateLocalContainer(deploymentid, selectednode.getNodeid()); //update container also in local
+            logger.info("****Deployment will be performed by "+selectednode.getNodeid());
             //communicate to node and trigger deployment
-            asynch.forwardDeploymentRequestToNode(selectednode.getNodeid(), request);
+            Util.forwardDeploymentRequestToNode(selectednode.getNodeid(), request);
+            logger.info("******request has been forwarded");
         }//if
         return deploymentid;
     }//EoM
-
+      
     public String handleDeployRequest(IoTBootRequest request) {
-        String ret = "Error";
+        logger.info("***Deploying");
+        String ret = "Success";
         //Step 1 - Configure Host entry for nexus 
         Util.setupHosts(request.getNexusIPv6(), request.getMasterIPv6());
         //Step 2 - Configure Docker
@@ -61,8 +70,8 @@ public class SynchExecutors {
         Util.setupNetdata(request.getGraphID().toLowerCase(), request.getGraphInstanceID().toLowerCase(), request.getComponentNodeID().toLowerCase());
         //Step 4 - Call Async to start agent
         asynch.bootAgent(request);
-
-        return IoTAgent.nodeid;
+        logger.info("***Agent booted");
+        return ret;
     }//EoM
 
     public void getNodeStateForNodestas(List<Nodestat> nodestatlist) {

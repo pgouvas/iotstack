@@ -138,18 +138,4 @@ public class AsyncExecutors {
         agent.bootAgent(args);
     }//EoM
     
-    @Async
-    public void forwardDeploymentRequestToNode(String nodeid, IoTBootRequest request) {
-        logger.info("forwardDeploymentRequestToNode " + nodeid + "  for request: " + request.getGraphInstanceID() );
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://[" + nodeid + "]:8080/api/v1/bootinstance";
-        try {
-            //logger.info("Performing rest");
-            restTemplate.postForObject(url, request, IoTBootRequest.class);
-            //logger.info("Response at " + targetid);
-        } catch (Exception ex) {
-            logger.severe(ex.getMessage());
-        }
-    }//EoM
-
 }//EoC

@@ -47,7 +47,7 @@ public class NodestatRepository {
     }//EoM
 
     public List<Nodestat> findAllAvailable() {
-        return jdbcTemplate.query("select * from nodestat where container!=null", new NodestatRowMapper());
+        return jdbcTemplate.query("select * from nodestat where container is null", new NodestatRowMapper());
     }//EoM    
     
     public List<Nodestat> findById(String nodeid) {

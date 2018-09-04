@@ -39,7 +39,7 @@ public class DBManager {
     @Autowired
     NodestatRepository nodestatrepo;
 
-    @Transactional
+//    @Transactional
     public void updatePeersLocal(List<Peer> addlist, List<Peer> dellist) {
         logger.info("DBManager.updatePeers additions: " + addlist.size() + " deletions: " + dellist.size());
         for (Peer peer : dellist) {
@@ -67,7 +67,7 @@ public class DBManager {
     }//EoM
 
     //--------------------Commands Handling-----------------    
-    @Transactional
+//    @Transactional
     public void updatePeersRemote(CommandUnicastUpdatePeers updatecommand) {
         List<Peer> addlist = updatecommand.getAddlist();
         List<Peer> dellist = updatecommand.getDellist();
@@ -96,7 +96,7 @@ public class DBManager {
         }
     }//EoM    
 
-    @Transactional
+//    @Transactional
     public void updateGateway(CommandBroadcastUpdateGateway cbug) {
         logger.info("DBManager.updateGateway " + cbug.getCid());
         if (clogrepo.findById(cbug.getCid()).size() == 0) {
@@ -122,7 +122,7 @@ public class DBManager {
         }
     }//EoM
 
-    @Transactional
+//    @Transactional
     public RestResponse validatecredentials(Credentials credentials) {
         RestResponse result = new RestResponse();
         if (credentials.getUsername().equalsIgnoreCase("admin") && credentials.getPassword().equalsIgnoreCase("!admin!")) {
@@ -135,7 +135,7 @@ public class DBManager {
         return result;
     }//EoM
 
-    @Transactional
+//    @Transactional
     public Nodestat getNodestatsForRemoteReporting() {
         Node node = noderepo.findById(IoTAgent.nodeid).get(0);
         Nodestat nodestat = new Nodestat();
@@ -151,7 +151,7 @@ public class DBManager {
         return nodestat;
     }//EoM
 
-    @Transactional
+//    @Transactional
     public void updateNodestat(Nodestat nodestat) {
         logger.info("DBManager updating nodestats for " + nodestat.getNodeid());
         if (nodestatrepo.findById(nodestat.getNodeid()).isEmpty()) {
@@ -161,25 +161,25 @@ public class DBManager {
         }
     }//EoM
 
-    @Transactional
+//    @Transactional
     public void updateNodestatForBandwith(String nodeid, String bandwidth) {
 //        logger.info("DBManager updating nodestats for bandwidth" + nodeid);
         nodestatrepo.updateLocalBandwidth(bandwidth, nodeid);
     }//EoM    
 
-    @Transactional
+//    @Transactional
     public void updateNodestatForRTTDelay(String nodeid, String rttdelay) {
 //        logger.info("DBManager updating nodestats for rttdelay" + nodeid);
         nodestatrepo.updateLocalRttdelay(rttdelay, nodeid);
     }//EoM
 
-    @Transactional
+//    @Transactional
     public void updateNodestatForPacketLoss(String nodeid, String packetloss) {
 //        logger.info("DBManager updating nodestats for packetloss" + nodeid);
         nodestatrepo.updateLocalPacketloss(packetloss, nodeid);
     }//EoM    
 
-    @Transactional
+//    @Transactional
     public ResourceModel getResources() {
         logger.info("getResources vcpus: " + nodestatrepo.getMaxVCPUs() + " ram: " + nodestatrepo.getMaxRam());
         ResourceModel resourcemodel = new ResourceModel();
@@ -196,7 +196,7 @@ public class DBManager {
         return resourcemodel;
     }//EoM
 
-    @Transactional
+//    @Transactional
     public Topology getTopology() {
         Topology topology = new Topology();
         topology.setPeers(peerrepo.findAll());

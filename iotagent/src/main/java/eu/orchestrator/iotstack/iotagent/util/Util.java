@@ -2,6 +2,7 @@ package eu.orchestrator.iotstack.iotagent.util;
 
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
+import eu.orchestrator.transfer.entities.iotstack.IoTBootRequest;
 import eu.orchestrator.transfer.entities.iotstack.Node;
 import eu.orchestrator.transfer.entities.iotstack.Peer;
 import java.io.BufferedReader;
@@ -403,4 +404,18 @@ public class Util {
         }
     }//EoM    
 
+    
+    public static void forwardDeploymentRequestToNode(String nodeid, IoTBootRequest request) {
+        logger.info("forwardDeploymentRequestToNode " + nodeid + "  for request: " + request.getGraphInstanceID() );
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://[" + nodeid + "]:8080/api/v1/bootinstance";
+        try {
+            //logger.info("Performing rest");
+            restTemplate.postForObject(url, request, IoTBootRequest.class);
+            //logger.info("Response at " + targetid);
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }//EoM      
+    
 }//EoC

@@ -107,30 +107,30 @@ public class RestAgentController {
     @RequestMapping(value = "/instance", method = RequestMethod.POST)
     public RestResponse bootInstanceproxy(@RequestBody IoTBootRequest bootrequest) {
         RestResponse response = new RestResponse();
-        logger.info("Create Instance received");
+        logger.info("*****Rest BootInstance-Proxy  received");
         
         String deployid = synch.findAvailableResourceAndDeploy(bootrequest);
-        
+//        logger.info("Deploymentid: "+deployid);
         response.setRescode(ResponseCode.SUCCESS);
         response.setMessage("Success");
         response.setResobject(""+deployid);
         
-        logger.info("Rest bootInstance executed");
+        logger.info("****Rest BootInstance-Proxy handled");
         return response;
     }//EoM      
     
     @RequestMapping(value = "/bootinstance", method = RequestMethod.POST)
     public RestResponse bootInstance(@RequestBody IoTBootRequest bootrequest) {
         RestResponse response = new RestResponse();
-        logger.info("Create Instance received");
+        logger.info("****Rest bootinstance received");
         
-        String deployid = synch.handleDeployRequest(bootrequest);
+        String success = synch.handleDeployRequest(bootrequest);
         
         response.setRescode(ResponseCode.SUCCESS);
         response.setMessage("Success");
-        response.setResobject(""+deployid);
+        response.setResobject(""+success);
         
-        logger.info("Rest bootInstance executed");
+        logger.info("****Rest bootInstance executed");
         return response;
     }//EoM      
 
