@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -45,7 +46,7 @@ public class NodestatRepository {
     public List<Nodestat> findAll() {
         return jdbcTemplate.query("select * from nodestat", new NodestatRowMapper());
     }//EoM
-
+    
     public List<Nodestat> findAllAvailable() {
         return jdbcTemplate.query("select * from nodestat where container is null", new NodestatRowMapper());
     }//EoM    
@@ -53,6 +54,10 @@ public class NodestatRepository {
     public List<Nodestat> findById(String nodeid) {
         return jdbcTemplate.query("select * from nodestat where nodeid=?", new Object[]{nodeid}, new NodestatRowMapper());
     }//EoM
+    
+    public List<Nodestat> findByContainer(String container) {
+        return jdbcTemplate.query("select * from nodestat where container=?", new Object[]{container}, new NodestatRowMapper());
+    }//EoM    
 
     public int deleteById(String nodeid) {
         return jdbcTemplate.update("delete from nodestat where nodeid=?", new Object[]{nodeid});
@@ -64,8 +69,8 @@ public class NodestatRepository {
     }//EoM
 
     public int updateRemote(Nodestat nodestat) {
-        return jdbcTemplate.update("update nodestat " + " set nodeid = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ?, checkdate = ? , container = ?   where nodeid = ?",
-                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getCheckdate(), nodestat.getContainer(), nodestat.getNodeid()});
+        return jdbcTemplate.update("update nodestat " + " set nodeid = ?, gateway = ?, osarch = ?, osname = ?, bootdate = ?, checkdate = ?  where nodeid = ?",
+                new Object[]{nodestat.getNodeid(), nodestat.getGateway(), nodestat.getOsarch(), nodestat.getOsname(), nodestat.getBootdate(), nodestat.getCheckdate(), nodestat.getNodeid()});
     }//EoM
 
     public int updateLocalRttdelay(String value, String nodeid) {
@@ -82,11 +87,16 @@ public class NodestatRepository {
         return jdbcTemplate.update("update nodestat " + " set  packetloss = ?  where nodeid = ?",
                 new Object[]{  value,  nodeid });
     }//EoM    
-    
+       
     public int updateLocalContainer(String value, String nodeid) {
         return jdbcTemplate.update("update nodestat " + " set  container = ?  where nodeid = ?",
                 new Object[]{  value,  nodeid });
     }//EoM        
+       
+    public int clearContainer(String containerid) {
+        return jdbcTemplate.update("update nodestat " + " set  container = null  where container = ?",
+                new Object[]{  containerid });
+    }//EoM            
     
     class IntRowMapper implements RowMapper<Integer> {
 

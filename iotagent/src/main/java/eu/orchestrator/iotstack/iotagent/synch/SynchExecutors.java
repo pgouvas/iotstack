@@ -6,6 +6,7 @@ import eu.orchestrator.iotstack.iotagent.dao.NodestatRepository;
 import eu.orchestrator.iotstack.iotagent.dao.PeerRepository;
 import eu.orchestrator.iotstack.iotagent.util.Util;
 import eu.orchestrator.transfer.entities.iotstack.IoTBootRequest;
+import eu.orchestrator.transfer.entities.iotstack.IoTRemoveInstance;
 import eu.orchestrator.transfer.entities.iotstack.Nodestat;
 import eu.orchestrator.transfer.entities.iotstack.Peer;
 import java.util.ArrayList;
@@ -39,27 +40,32 @@ public class SynchExecutors {
     public String findAvailableResourceAndDeploy(IoTBootRequest request) {
         String deploymentid = "";
         List<Nodestat> availableresources = nodestatrepo.findAllAvailable();
-        logger.info("**** nodestatrepo.findAllAvailable() "+availableresources.size());
-            
+        logger.info("**** nodestatrepo.findAllAvailable() " + availableresources.size());
+
         if (!availableresources.isEmpty()) {
             Nodestat selectednode = availableresources.get(0);
             deploymentid = selectednode.getNodeid() + "_" + request.getGraphID() + "_" + request.getGraphInstanceID() + "_" + request.getComponentNodeID() + "_" + request.getComponentNodeInstanceID();
-            logger.info("**** deploymentid: "+deploymentid);
-        
-            //save
+            logger.info("**** deploymentid: " + deploymentid);
+
+            //persist to database
             selectednode.setContainer(deploymentid);
+            logger.info("****Persisting " + deploymentid + "  for " + selectednode.getNodeid());
             nodestatrepo.updateLocalContainer(deploymentid, selectednode.getNodeid()); //update container also in local
-            logger.info("****Deployment will be performed by "+selectednode.getNodeid());
+            logger.info("****Deployment will be performed by " + selectednode.getNodeid());
             //communicate to node and trigger deployment
             Util.forwardDeploymentRequestToNode(selectednode.getNodeid(), request);
             logger.info("******request has been forwarded");
         }//if
         return deploymentid;
     }//EoM
-      
+
     public String handleDeployRequest(IoTBootRequest request) {
         logger.info("***Deploying");
         String ret = "Success";
+        String deploymentid = IoTAgent.nodeid + "_" + request.getGraphID() + "_" + request.getGraphInstanceID() + "_" + request.getComponentNodeID() + "_" + request.getComponentNodeInstanceID();
+        //persist to database
+        nodestatrepo.updateLocalContainer(deploymentid, IoTAgent.nodeid); //update container also in local
+
         //Step 1 - Configure Host entry for nexus 
         Util.setupHosts(request.getNexusIPv6(), request.getMasterIPv6());
         //Step 2 - Configure Docker
@@ -73,6 +79,29 @@ public class SynchExecutors {
         logger.info("***Agent booted");
         return ret;
     }//EoM
+
+    public String findOwningResourceAndUnDeploy(IoTRemoveInstance delrequest) {
+        logger.info("***UnDeploying forwarding");
+        String ret = "Success";
+        String nodeid = nodestatrepo.findByContainer(delrequest.getId()).get(0).getNodeid();
+        logger.info("Owning resource found: " + nodeid);
+        //delete database
+        nodestatrepo.clearContainer(delrequest.getId());
+        //forwarding
+        Util.forwardUnDeploymentRequestToNode(nodeid, delrequest);
+        return ret;
+    }//EoM
+
+    public String handleUndeploymentRequest(IoTRemoveInstance delrequest) {
+        logger.info("***UNDeploying  " + delrequest.getId());
+        String ret = "Success";
+        //update database
+        nodestatrepo.clearContainer(delrequest.getId());
+        //close database
+        Util.closeAllservices();
+        logger.info("***Agent destroyed");
+        return ret;
+    }
 
     public void getNodeStateForNodestas(List<Nodestat> nodestatlist) {
 

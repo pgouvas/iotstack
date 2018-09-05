@@ -139,11 +139,25 @@ public class RestAgentController {
         RestResponse response = new RestResponse();
         logger.info("Rest removeInstance received");
         
+        synch.findOwningResourceAndUnDeploy(delrequest);
+        
         response.setRescode(ResponseCode.SUCCESS);
         logger.info("Rest removeInstance executed");
         return response;
     }//EoM      
 
+    @RequestMapping(value = "/deleteinstanceactual", method = RequestMethod.POST)
+    public RestResponse removeInstanceactual(@RequestBody IoTRemoveInstance delrequest) {
+        RestResponse response = new RestResponse();
+        logger.info("Rest removeInstance received");
+        
+        synch.handleUndeploymentRequest(delrequest);
+        
+        response.setRescode(ResponseCode.SUCCESS);
+        logger.info("Rest removeInstance executed");
+        return response;
+    }//EoM      
+    
     @RequestMapping(value = "/resources", method = RequestMethod.POST)
     public RestResponse getResources(@RequestBody Credentials credentials) {    
         RestResponse response = new RestResponse();

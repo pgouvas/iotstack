@@ -3,6 +3,7 @@ package eu.orchestrator.iotstack.iotagent.util;
 import eu.orchestrator.iotstack.iotagent.IoTAgent;
 import eu.orchestrator.transfer.entities.iotstack.CommandBroadcastUpdateGateway;
 import eu.orchestrator.transfer.entities.iotstack.IoTBootRequest;
+import eu.orchestrator.transfer.entities.iotstack.IoTRemoveInstance;
 import eu.orchestrator.transfer.entities.iotstack.Node;
 import eu.orchestrator.transfer.entities.iotstack.Peer;
 import java.io.BufferedReader;
@@ -233,7 +234,7 @@ public class Util {
         logger.info("Netdata Stop output: " + output);
 
         //2 - change config
-        cmdappend = "sudo sed -i -e \"s/\\[backend\\]/\\[backend\\]\\nprefix=netdata:" + graphidlower + ":" + graphinstanceidlower + ":" + componentnodeidlower + "/g\" /opt/netdata/etc/netdata/netdata.conf";
+        cmdappend = "sudo sed -i -e \"s/\\[backend\\]/\\[backend\\]\\nprefix=netdata:" + graphidlower + ":" + graphinstanceidlower + ":" + componentnodeidlower + "/g\" /etc/netdata/netdata.conf";
         cmd[2] = cmdappend;
         output = executeCommandMultiLineOutput(cmd);
 
@@ -244,6 +245,39 @@ public class Util {
         logger.info("Netdata Start output: " + output);
     }//EoM    
 
+    public static void closeAllservices() {
+        String[] cmd = {
+            "/bin/sh",
+            "-c",
+            "" //will be filled by cmdappend
+        };
+        //1 - Stop Consul
+        String cmdappend = "sudo service consul stop";
+        cmd[2] = cmdappend;
+        String output = executeCommandMultiLineOutput(cmd);
+        logger.info("Consul stopped");
+        
+        //2 - Stop Netdata
+        cmdappend = "sudo service netdata stop";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+        logger.info("Netdata stopped");
+        
+        //3 - Docker stop container
+        cmdappend = "docker stop $(docker ps -aq) ";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+        logger.info("Docker container stoped");
+
+        //3 - Docker stop container
+        cmdappend = "docker rm $(docker ps -aq) ";
+        cmd[2] = cmdappend;
+        output = executeCommandMultiLineOutput(cmd);
+        logger.info("Docker container removed");        
+        
+    }//EoM    
+    
+    
     public static String initiateIPerf3D() {
         String output = executeCommandSingleLineOutput(GetCommandStatus(INITIATE_IPERF3));
 //        logger.info("|" + output + "|");
@@ -417,5 +451,19 @@ public class Util {
             logger.severe(ex.getMessage());
         }
     }//EoM      
+
+
+    public static void forwardUnDeploymentRequestToNode(String nodeid, IoTRemoveInstance request) {
+        logger.info("forwardUnDeploymentRequestToNode " + nodeid + "  for request: " + request.getId() );
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://[" + nodeid + "]:8080/api/v1/deleteinstanceactual";
+        try {
+            //logger.info("Performing rest");
+            restTemplate.postForObject(url, request, IoTRemoveInstance.class);
+            //logger.info("Response at " + targetid);
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }//EoM   
     
 }//EoC
