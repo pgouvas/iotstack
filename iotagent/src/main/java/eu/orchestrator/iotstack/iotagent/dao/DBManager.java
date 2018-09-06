@@ -38,7 +38,7 @@ public class DBManager {
     PeerRepository peerrepo;
     @Autowired
     NodestatRepository nodestatrepo;
-
+    
 //    @Transactional
     public void updatePeersLocal(List<Peer> addlist, List<Peer> dellist) {
         logger.info("DBManager.updatePeers additions: " + addlist.size() + " deletions: " + dellist.size());
@@ -199,7 +199,8 @@ public class DBManager {
 //    @Transactional
     public Topology getTopology() {
         Topology topology = new Topology();
-        topology.setPeers(peerrepo.findAll());
+        topology.setPeers(peerrepo.findAllActive());
+        topology.setNodes(nodestatrepo.findAll());
         return topology;
     }//EoM
 
