@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -115,4 +114,22 @@ public class NodestatRepository {
         return jdbcTemplate.query("select sum(totalmemory) from nodestat", new IntRowMapper()).get(0);
     }//EoM
 
+    public Integer getMaxInstances() {
+        return jdbcTemplate.query("select count(*) from nodestat", new IntRowMapper()).get(0);
+    }//EoM    
+    
+    
+    public Integer getRunningInstances() {
+        return jdbcTemplate.query("SELECT count(*) FROM NODESTAT where container is not null", new IntRowMapper()).get(0);
+    }//EoM      
+    
+    
+    public Integer getUsedRam() {
+        return jdbcTemplate.query("SELECT sum(totalmemory) FROM NODESTAT where container is not null", new IntRowMapper()).get(0);
+    }
+
+    public Integer getUsedVCpus() {
+        return jdbcTemplate.query("SELECT sum(vcpus) FROM NODESTAT where container is not null", new IntRowMapper()).get(0);
+    }    
+    
 }//EoC

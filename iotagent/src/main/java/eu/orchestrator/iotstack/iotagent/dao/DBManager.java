@@ -184,15 +184,31 @@ public class DBManager {
         logger.info("getResources vcpus: " + nodestatrepo.getMaxVCPUs() + " ram: " + nodestatrepo.getMaxRam());
         ResourceModel resourcemodel = new ResourceModel();
         resourcemodel.setId(IoTAgent.nodeid);
-        resourcemodel.setMaxRam(nodestatrepo.getMaxRam());
-        resourcemodel.setMaxVCpus(nodestatrepo.getMaxVCPUs());
-        resourcemodel.setMaxInstances(0);
-        resourcemodel.setRunningInstances(0);
-        resourcemodel.setUsedRam(0);
-        resourcemodel.setUsedVCpus(0);
-        resourcemodel.setvCpuUtilization(0.0);
-        resourcemodel.setRamUtilization(0.0);
-        resourcemodel.setInstancesUtilization(0.0);
+        
+        int maxram = nodestatrepo.getMaxRam();
+        resourcemodel.setMaxRam(maxram);
+        
+        int maxvcpus = nodestatrepo.getMaxVCPUs();
+        resourcemodel.setMaxVCpus(maxvcpus);
+        
+        int maxinstances = nodestatrepo.getMaxInstances();
+        resourcemodel.setMaxInstances( maxinstances );
+        
+        int runninginstances = nodestatrepo.getRunningInstances();
+        resourcemodel.setRunningInstances(runninginstances);
+        
+        int usedram = nodestatrepo.getUsedRam();
+        resourcemodel.setUsedRam(usedram);
+        
+        int usedvcpus = nodestatrepo.getUsedVCpus();
+        resourcemodel.setUsedVCpus(usedvcpus);
+        
+        resourcemodel.setvCpuUtilization(  ((double)usedvcpus) / ((double)maxvcpus) );
+        
+        resourcemodel.setRamUtilization( ((double)usedram) / ((double)maxram) );
+        
+        resourcemodel.setInstancesUtilization( ((double)runninginstances) / ((double)maxinstances) );
+        
         return resourcemodel;
     }//EoM
 
